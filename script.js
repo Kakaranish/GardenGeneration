@@ -1,35 +1,33 @@
 $(document).ready(function () {
-    const tile_size = 32;
-    const tiles_num = 15;
-    const canvas_size = tiles_num * tile_size;
+    const tileSize = 32;
+    const tilesNum = 15;
+    const canvasSize = tilesNum * tileSize;
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = canvas_size;
-    canvas.height = canvas_size;
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
     ctx.fillStyle = "#75CB75";
-    ctx.fillRect(0, 0, canvas_size, canvas_size);
+    ctx.fillRect(0, 0, canvasSize, canvasSize);
 
     function showGrid() {
         ctx.fillStyle = "#000000";
-        let times = Math.floor(canvas_size / tile_size);
+        let times = Math.floor(canvasSize / tileSize);
         console.log(times);
         for (let i = 1; i <= times; i++) {
-            coord = i * tile_size;
+            coord = i * tileSize;
             ctx.beginPath();
             ctx.moveTo(coord, 0);
-            ctx.lineTo(coord, canvas_size);
+            ctx.lineTo(coord, canvasSize);
             ctx.stroke();
 
             ctx.beginPath();
             ctx.moveTo(0, coord);
-            ctx.lineTo(canvas_size, coord);
+            ctx.lineTo(canvasSize, coord);
             ctx.stroke();
         }
     }
-    showGrid();
 
-    
     var Direction = {
         UP: 1,
         RIGHT: 2,
@@ -37,7 +35,7 @@ $(document).ready(function () {
         LEFT: 4
     };
 
-    var NodeType = {
+    var TileType = {
         TREE: "img/tree.png",
         ROCK: "img/rock.png",
         WATER: "img/water.png",
@@ -45,127 +43,133 @@ $(document).ready(function () {
         FLOWER2: "img/flower2.png"
     };
 
-    
-    let tileSize = 64;
-    let mapSize = 10;
-    let map = new Array(10)
-    for (i = 0; i < 10; i++) {
-        map[i] = new Array(mapSize);
+    let tiles = new Array(tilesNum)
+    for (i = 0; i < tilesNum; i++) {
+        tiles[i] = new Array(tilesNum);
     }
 
-    class Position {
-        constructor(x, y) {
+    class Tile {
+        constructor(parent, nodeType, x, y) {
+            this.parent = parent;
+            this.nodeType = nodeType;
             this.x = x;
             this.y = y;
+            this.childs = [];
+
+            tiles[x - 1][y - 1] = this;
         }
 
-        static isValid(position) {
-            if (position.x < 0 || position.x >= 10 || position.y < 0 || position.y >= 10) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-    }
-
-    class Node {
-        constructor(parent, nodeType, direction) {
-            this.isParent = false;
-            if (parent == null || parent == undefined) {
-                console.log("Unable to add node with empty parent.");
-                return;
-            }
-
-            this.nodes = [];
-            this.position = getChildPosition(parent, direction);
-            this.nodeType = nodeType;
-
-            this.parent = parent;
-            this.direction = direction;
-        }
-
-        static getChildPosition(parent, direction) {
-            let x = parent.x;
-            let y = parent.y;
+        getChildCoords(direction) {
+            let child_x = this.x;
+            let child_y = this.y;
 
             switch (direction) {
                 case Direction.LEFT:
-                    x--;
+                    child_x--;
                     break;
                 case Direction.RIGHT:
-                    x++;
+                    child_x++;
                     break;
                 case Direction.UP:
-                    y--;
+                    child_y--;
                     break;
                 case Direction.DOWN:
-                    y++;
+                    child_y++;
                     break;
             }
 
-            let newPosition = new Position(x, y);
-            return newPosition;
+            return [child_x, child_y];
         }
 
-        static init(position, nodeType) {
-            if (Position.isValid(position) == false) {
-                console.log("Unable to init. Invalid position.");
-                return;
+        addChild(nodeType, direction) {
+
+            if (this.childs.some(child => child.direction === direction)) {
+                console.log("Two childs can't have same direction");
+                return null;
             }
 
-            this.position = position;
+            let child_coords = this.getChildCoords(direction);
+            let child_x = child_coords[0];
+            let child_y = child_coords[1];
 
-            this.isParent = true;
-            this.nodeType = nodeType;
-        }
-
-        addNext(nodeType, direction) {
-
-            if (this.nodes.some(node => node.direction === direction)) {
-                console.log("Two nodes can't have same direction");
-                return;
+            if (tiles[child_x - 1][child_y - 1] !== undefined) {
+                console.log("Tile on " + child_x + "," + child_y + " already exists.");
+                console.log(tiles);
+                return null;
             }
 
-            let newNode = new Node(this, nodeType, direction);
-            this.nodes.push(newNode);
+            let child = new Tile(this, nodeType, child_x, child_y);
+            this.childs.push(child);
 
-            return newNode;
+            return child;
         }
 
         draw() {
+            const image = new Image(tileSize, tileSize);
+            image.onload = drawImageActualSize;
+            image.src = this.nodeType;
 
-            let real_x = this.x * tileSize;
-            let real_y = this.y * tileSize;
-
-            // const canvas = document.getElementById('canvas');
-            // const ctx = canvas.getContext('2d');
-
-            // const image = new Image(tileSize, tileSize);
-            // image.onload = drawImageActualSize; // Draw when image has loaded
-
-            // Load an image of intrinsic size 300x227 in CSS pixels
-            // image.src = 'https://mdn.mozillademos.org/files/5397/rhino.jpg'
-            // ctx.drawImage(this, 0, 0, this.width, this.height);
-
-            // this.nodes.forEach(child => {
-            //     child.draw();
-            // })
+            let canvas_x = (this.x - 1) * tileSize;
+            let canvas_y = (this.y - 1) * tileSize;
+            function drawImageActualSize() {
+                ctx.drawImage(this, canvas_x, canvas_y, this.width, this.height);
+            }
         }
     }
 
-    function drawTile(nodeType, x, y) {
-        const image = new Image(32, 32);
-        image.onload = drawImageActualSize;
-        image.src = nodeType;
-
-        let canvas_x = (x - 1) * tile_size;
-        let canvas_y = (y - 1) * tile_size;
-        function drawImageActualSize() {
-            ctx.drawImage(this, canvas_x, canvas_y, this.width, this.height);
+    function drawTiles() {
+        for (let i = 0; i < tilesNum; i++) {
+            for (let j = 0; j < tilesNum; j++) {
+                let tile = tiles[i][j];
+                if (tile === undefined) {
+                    continue;
+                }
+                tile.draw();
+            }
         }
     }
-    
-    drawTile(NodeType.TREE,1,1);    
-    drawTile(NodeType.FLOWER2,2,2);    
+
+    function initSampleMap()
+    {
+        let rootTile = new Tile(null, TileType.WATER, 1, 7);
+        rootTile.addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.DOWN)
+            .addChild(TileType.WATER, Direction.DOWN)
+            .addChild(TileType.WATER, Direction.DOWN)
+            .addChild(TileType.WATER, Direction.DOWN)
+            .addChild(TileType.WATER, Direction.DOWN)
+            .addChild(TileType.WATER, Direction.DOWN)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.DOWN)
+            .addChild(TileType.WATER, Direction.DOWN)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.RIGHT)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.UP)
+            .addChild(TileType.WATER, Direction.RIGHT);
+        
+        let waterTile1 = tiles[8 - 1][6- 1];
+        let tree1 = waterTile1.addChild(TileType.TREE, Direction.UP);
+        tree1.addChild(TileType.TREE, Direction.LEFT).addChild(TileType.TREE, Direction.DOWN);
+        tree1.addChild(TileType.TREE, Direction.RIGHT);    
+    }
+    initSampleMap();
+    drawTiles();
+    showGrid();
 });
