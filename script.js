@@ -38,6 +38,7 @@ $(document).ready(function () {
         TREE: "img/tree.png",
         ROCK: "img/rock.png",
         WATER: "img/water.png",
+	BRIDGE: "img/rock.png",
         FLOWER1: "img/flower1.png",
         FLOWER2: "img/flower2.png"
     };
@@ -46,7 +47,12 @@ $(document).ready(function () {
     for (i = 0; i < tilesNum; i++) {
         tiles[i] = new Array(tilesNum);
     }
-
+    
+    let waterTiles = new Array(tilesNum)
+    for (i = 0; i < tilesNum; i++) {
+        waterTiles[i] = new Array(tilesNum);
+    }
+    
     class Tile {
         constructor(parent, tileType, x, y) {
             this.parent = parent;
@@ -56,6 +62,9 @@ $(document).ready(function () {
             this.childs = [];
 
             tiles[x - 1][y - 1] = this;
+	    if(tileType == TileType.WATER){
+		waterTiles[x - 1][y - 1] = this;
+	    }
         }
 
         getChildCoords(direction) {
@@ -159,6 +168,29 @@ $(document).ready(function () {
         }
         tile = tiles[x - 1][y - 1];
         return tile === undefined ? null : tile.tileType;
+    }
+    
+    class BridgeTile extends Tile {
+	constructor(parent, x, y, isHorizontal) {
+	  super(parent, TileType.BRIDGE, x, y);
+	  this.isHorizontal = isHorizontal;
+	}
+	
+	draw() {
+            const image = new Image(tileSize, tileSize);
+            image.onload = drawImageActualSize;
+            image.src = this.tileType;
+
+            let canvas_x = (this.x - 1) * tileSize;
+            let canvas_y = (this.y - 1) * tileSize;
+            function drawImageActualSize() {
+                ctx.save();
+		ctx.translate(canvas_x + tileSize / 2, canvas_y + tileSize / 2);
+		ctx.rotate(90 * Math.PI/180);
+		ctx.drawImage(this, -tileSize/2, -tileSize/2, this.width, this.height);
+		ctx.restore();
+            }
+        }
     }
 
     function drawTiles() {
@@ -274,14 +306,37 @@ $(document).ready(function () {
             .addChild(TileType.WATER, Direction.UP)
             .addChild(TileType.WATER, Direction.RIGHT);
         
-        let waterTile1 = tiles[8 - 1][6- 1];
+        let waterTile1 = tiles[8 - 1][6 - 1];
         let tree1 = waterTile1.addChild(TileType.TREE, Direction.UP);
         tree1.addChild(TileType.TREE, Direction.LEFT).addChild(TileType.TREE, Direction.DOWN);
-        tree1.addChild(TileType.TREE, Direction.RIGHT);    
+        tree1.addChild(TileType.TREE, Direction.RIGHT);
+	// let waterTile2 = tiles[5 - 1][9 - 1];
+	let bridgeTile = new BridgeTile(null, 5, 8, false);
+	
+	
+	
     }
 
-    // initSampleMap();
-    generateWaterPath();
+    function getRandomTrueOrFalse(){
+	let value = Math.round(Math.random());
+	return value ? true : false;
+    }
+    
+    function generateFlora(){
+	let populateAbove = getRandomTrueOrFalse();
+	let populateBelow = getRandomTrueOrFalse();
+	
+	if(populateAbove){
+	    
+	}
+	
+	if(populateBelow){
+	  
+	}
+    }
+    
+     initSampleMap();
+    // generateWaterPath();
     drawTiles();
     showGrid();
 });
