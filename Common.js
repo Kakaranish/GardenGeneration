@@ -10,6 +10,7 @@ var TileType = {
     ROCK: "img/rock.png",
     WATER: "img/water.png",
     BRIDGE: "img/bridge.png",
+    PATH: "img/path.png",
     FLOWER1: "img/flower1.png",
     FLOWER2: "img/flower2.png"
 };

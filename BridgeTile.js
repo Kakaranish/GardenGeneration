@@ -1,9 +1,9 @@
 class BridgeTile extends Tile {
     constructor(map, parent, x, y) {
         super(map, parent, TileType.BRIDGE, x, y);
-        let other_tile = this.map.tiles[x - 1][y - 1];
+        let other_tile = this.map.tiles[x - 1][y - 1]; // ?????
         this.childs.push(other_tile);
-        this.isHorizontal = this.isHorizontal();
+        this.map.bridge = this;
     }
 
     static isBridgeLegal(map, x, y) {

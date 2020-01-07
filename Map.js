@@ -13,6 +13,7 @@ class Map {
         this.waterTiles = null;
         this.initWaterTiles();
 
+        this.pathTiles = [];
         this.bridge = null;
 
         this.fillBackground();

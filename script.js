@@ -8,7 +8,7 @@ canvas.height = 0;
 
 function generateWaterPath() {
     const break_size = 3;
-    let init_y = Math.floor(Math.random() * MAP_HEIGHT) + 1;
+    let init_y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
     let breaks_num = Math.floor(Math.random() * 5) + 2;
     let max_movement = Math.floor(MAP_WIDTH / breaks_num) + 2;
 
@@ -97,7 +97,92 @@ function generateWaterPath() {
         }
     }
 
+    // Generate path (from bottom to bridge)
+    // let path_coords = {};
+    // console.log(map.bridge);
+    // if(map.bridge.isHorizontal()){
+    //     path_coords.x = 2;
+    //     path_coords.y = 3;
+    // }
+
+
+    // let path_starts_from_left = randomTrueOrFalse();
+    // let path_x = path_starts_from_left ? randomInt(3, 6) : map.width - randomInt(3, 6);
+    // let path_y = map.height;
+    // let x_movement_multiplier = path_starts_from_left ? 1 : -1;
+
+    // let pathTile = new Tile(map, null, TileType.PATH, path_x, path_y);
+
+    findShortestPath(map);
     map.draw();
+}
+
+function findShortestPath(map) {
+    let path_starts_from_left = randomTrueOrFalse();
+    let path_coords = {
+        "x": path_starts_from_left ? randomInt(3, 6) : map.width - randomInt(3, 6),
+        "y": map.height
+    }
+
+    let bridge_coords = {
+        "x": map.bridge.x,
+        "y": map.bridge.y
+    }
+
+    let currentCoords = {
+        "x": map.bridge.x,
+        "y": map.bridge.y
+    };
+    for (let i = 1; i <= 3; i++) {
+        let move_offsets = {};
+
+        if (currentCoords.x == 1 || currentCoords.x == map.width ||
+            currentCoords.y == 1 || currentCoords.y == map.height) {
+                break;
+        }
+
+        while (true) {
+            let moves_horizontally = randomTrueOrFalse();
+            if (moves_horizontally) {
+                move_offsets.y = 0;
+                let moves_left = randomTrueOrFalse();
+                if (moves_left) {
+                    move_offsets.x = -1;
+                } else {
+                    move_offsets.x = 1;
+                }
+            } else {
+                move_offsets.x = 0;
+                let moves_up = randomTrueOrFalse();
+                if (moves_up) {
+                    move_offsets.y = -1;
+                } else {
+                    move_offsets.y = 1;
+                }
+            }
+
+            let newCoords = {
+                "x": currentCoords.x + move_offsets.x,
+                "y": currentCoords.y + move_offsets.y
+            }
+            // if (map.tiles[newCoords.x - 1][newCoords.y - 1] !== undefined) {
+            //     continue;
+            // }
+            if(PathTile.isPathLegal(map, newCoords.x, newCoords.y) == false){
+                continue;
+            }
+            currentCoords = newCoords;
+            new PathTile(map, null, currentCoords.x, currentCoords.y) //No parent ATM
+            break;
+        }
+    }
+
+
+    console.log(path_coords);
+
+    let x_movement_multiplier = path_starts_from_left ? 1 : -1;
+
+
 }
 
 function initSampleMap() {
