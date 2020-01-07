@@ -171,7 +171,7 @@ $(document).ready(function () {
     }
     
     class BridgeTile extends Tile {
-	constructor(parent, x, y, isHorizontal) {
+	constructor(parent, x, y, isHorizontal = false) {
 	  super(parent, TileType.BRIDGE, x, y);
 	  this.isHorizontal = isHorizontal;
 	}
@@ -183,12 +183,18 @@ $(document).ready(function () {
 
             let canvas_x = (this.x - 1) * tileSize;
             let canvas_y = (this.y - 1) * tileSize;
+	    let isHorizontal = this.isHorizontal;
             function drawImageActualSize() {
-                ctx.save();
-		ctx.translate(canvas_x + tileSize / 2, canvas_y + tileSize / 2);
-		ctx.rotate(90 * Math.PI/180);
-		ctx.drawImage(this, -tileSize/2, -tileSize/2, this.width, this.height);
-		ctx.restore();
+		if(isHorizontal === false){
+		    ctx.save();
+		    ctx.translate(canvas_x + tileSize / 2, canvas_y + tileSize / 2);
+		    ctx.rotate(90 * Math.PI/180);
+		    ctx.drawImage(this, -tileSize/2, -tileSize/2, this.width, this.height);
+		    ctx.restore();
+		} 
+		else {
+		  ctx.drawImage(this, canvas_x, canvas_y, this.width, this.height);
+		}
             }
         }
     }
@@ -309,12 +315,9 @@ $(document).ready(function () {
         let waterTile1 = tiles[8 - 1][6 - 1];
         let tree1 = waterTile1.addChild(TileType.TREE, Direction.UP);
         tree1.addChild(TileType.TREE, Direction.LEFT).addChild(TileType.TREE, Direction.DOWN);
-        tree1.addChild(TileType.TREE, Direction.RIGHT);
+        tree1.addChild(TileType.TREE, Direction.BRIDGE);
 	// let waterTile2 = tiles[5 - 1][9 - 1];
 	let bridgeTile = new BridgeTile(null, 5, 8, false);
-	
-	
-	
     }
 
     function getRandomTrueOrFalse(){
