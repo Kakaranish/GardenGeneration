@@ -14,7 +14,11 @@ var TileType = {
     FLOWER2: "img/flower2.png"
 };
 
-function getRandomTrueOrFalse() {
+function randomTrueOrFalse() {
     let value = Math.round(Math.random());
     return value ? true : false;
+}
+
+function randomInt(start, end) {
+    return Math.floor(Math.random() * (end - start + 1)) + start;
 }

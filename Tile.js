@@ -8,9 +8,6 @@ class Tile {
         this.childs = [];
 
         this.map.tiles[x - 1][y - 1] = this;
-        if (tileType == TileType.WATER) {
-            this.map.waterTiles[x - 1][y - 1] = this;
-        }
     }
 
     getChildCoords(direction) {

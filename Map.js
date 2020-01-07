@@ -13,22 +13,24 @@ class Map {
         this.waterTiles = null;
         this.initWaterTiles();
 
+        this.bridge = null;
+
         this.fillBackground();
     }
 
-    fillBackground(){
+    fillBackground() {
         this.context.fillStyle = "#75CB75";
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    initTiles(){
+    initTiles() {
         this.tiles = new Array(this.width)
         for (let i = 0; i < this.width; i++) {
             this.tiles[i] = new Array(this.height);
         }
     }
 
-    initWaterTiles(){
+    initWaterTiles() {
         this.waterTiles = new Array(this.width)
         for (let i = 0; i < this.width; i++) {
             this.waterTiles[i] = new Array(this.height);
@@ -60,7 +62,7 @@ class Map {
 
         let x_times = Math.floor(this.canvas.width / TILE_SIZE);
         let y_times = Math.floor(this.canvas.height / TILE_SIZE);
-        for (let i = 1; i <= x_times; i++){
+        for (let i = 1; i <= x_times; i++) {
             let coord = i * TILE_SIZE;
             this.context.beginPath();
             this.context.moveTo(coord, 0);
@@ -68,7 +70,7 @@ class Map {
             this.context.stroke();
         }
 
-        for (let i = 1; i <= y_times; i++){
+        for (let i = 1; i <= y_times; i++) {
             let coord = i * TILE_SIZE;
             this.context.beginPath();
             this.context.moveTo(0, coord);
@@ -77,7 +79,7 @@ class Map {
         }
     }
 
-    draw(){
+    draw() {
         this.drawTiles();
         this.drawGrid();
     }

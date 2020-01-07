@@ -1,11 +1,35 @@
 class BridgeTile extends Tile {
-    constructor(map, parent, x, y, isHorizontal = false) {
-        let other_tile = map.tiles[x - 1][y - 1];
-        if (other_tile === undefined || other_tile.tileType != TileType.WATER) {
-
-        }
+    constructor(map, parent, x, y) {
         super(map, parent, TileType.BRIDGE, x, y);
-        this.isHorizontal = isHorizontal;
+        let other_tile = this.map.tiles[x - 1][y - 1];
+        this.childs.push(other_tile);
+        this.isHorizontal = this.isHorizontal();
+    }
+
+    static isBridgeLegal(map, x, y) {
+        let tile_type = map.getTileType(x, y);
+        let tile_type_above = map.getTileType(x, y - 1);
+        let tile_type_on_right = map.getTileType(x + 1, y);
+        let tile_type_below = map.getTileType(x, y + 1);
+        let tile_type_on_left = map.getTileType(x - 1, y);
+
+        if (tile_type == null) {
+            return false;
+        }
+        if ((tile_type_above && tile_type_on_right) || (tile_type_on_right && tile_type_below)
+            || (tile_type_below && tile_type_on_left) || (tile_type_on_left && tile_type_above)) {
+            return false;
+        }
+        return true;
+    }
+
+    isHorizontal() {
+        let tile_type_above = this.map.getTileType(this.x, this.y - 1);
+        let tile_type_below = this.map.getTileType(this.x, this.y + 1);
+        if (tile_type_above && tile_type_below) {
+            return false;
+        }
+        return true;
     }
 
     draw() {

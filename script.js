@@ -1,5 +1,4 @@
-
-const MAP_WIDTH = 20;
+const MAP_WIDTH = 30;
 const MAP_HEIGHT = 20;
 const TILE_SIZE = 32;
 
@@ -7,18 +6,15 @@ const canvas = document.getElementById('canvas');
 canvas.width = 0;
 canvas.height = 0;
 
-
 function generateWaterPath() {
     const break_size = 3;
-    let init_y = Math.floor(Math.random() * MAP_WIDTH) + 1;
+    let init_y = Math.floor(Math.random() * MAP_HEIGHT) + 1;
     let breaks_num = Math.floor(Math.random() * 5) + 2;
     let max_movement = Math.floor(MAP_WIDTH / breaks_num) + 2;
 
     let remaining_movement = MAP_WIDTH;
     let horizontal_movements = [];
 
-    console.log("Breaks num = " + breaks_num);
-    console.log("Max movement = " + max_movement);
     for (let i = 1; i <= breaks_num; i++) {
         if (i == breaks_num) {
             horizontal_movements.push(remaining_movement);
@@ -35,18 +31,18 @@ function generateWaterPath() {
         remaining_movement -= movement;
     }
 
-    console.log(horizontal_movements);
-
-    let rootTile = new Tile(null, 1, init_y);
+    let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
+    let rootTile = new WaterTile(map, null, 1, init_y);
     let prevTile = rootTile;
 
     for (let i = 0; i < horizontal_movements.length; i++) {
         let movements_num = horizontal_movements[i];
         let j = i == 0 ? 2 : 1;
+        // Generate water tiles in x axis
         for (j; j <= movements_num; j++) {
             let newTile = null;
             do {
-                newTile = prevTile.addChild(TileType.WATER, Direction.RIGHT);
+                newTile = prevTile.addNextWaterTile(Direction.RIGHT);
             } while (newTile == null);
             prevTile = newTile;
         }
@@ -54,31 +50,58 @@ function generateWaterPath() {
         let isMovementUp = Math.round(Math.random());
         let maxYMovement = 0;
         if (isMovementUp) {
-            maxYMovement = prevTile.y - 1;
+            maxYMovement = prevTile.y - 3;
             if (maxYMovement < 1) {
                 isMovementUp = false;
-                maxYMovement = MAP_WIDTH - prevTile.y;
+                maxYMovement = MAP_HEIGHT - prevTile.y - 2;
             }
         } else {
-            maxYMovement = MAP_WIDTH - prevTile.y;
+            maxYMovement = MAP_HEIGHT - prevTile.y - 2;
             if (maxYMovement < 1) {
                 isMovementUp = true;
-                maxYMovement = prevTile.y - 1;
+                maxYMovement = prevTile.y - 3;
             }
         }
 
+        // Generate water tiles in y axis
         let movements = Math.floor(Math.random() * (maxYMovement - 1)) + 1;
         for (let j = 0; j < movements; j++) {
             let movementDirection = isMovementUp ? Direction.UP : Direction.DOWN;
-            prevTile = prevTile.addChild(TileType.WATER, movementDirection);
+            prevTile = prevTile.addNextWaterTile(movementDirection);
         }
     }
+
+    // Generate bridge
+    let water_tiles_intervals = {
+        "x_interval": {
+            "left": Math.floor(map.width / 2) - Math.floor(map.width / 4),
+            "right": Math.floor(map.width / 2) + Math.floor(map.width / 4)
+        }
+    }
+
+    let matching_water_tiles = map.waterTiles.flat().filter(function (tile) {
+        return tile.x >= water_tiles_intervals.x_interval.left &&
+            tile.x <= water_tiles_intervals.x_interval.right;
+    });
+
+    let bridge_is_legal = false;
+    while (true) {
+        let random_matching_water_tile = matching_water_tiles[
+            randomInt(0, matching_water_tiles.length - 1)];
+        bridge_is_legal = BridgeTile.isBridgeLegal(map, random_matching_water_tile.x,
+            random_matching_water_tile.y);
+        if (bridge_is_legal) {
+            let bridgeTile = new BridgeTile(map, null, random_matching_water_tile.x,
+                random_matching_water_tile.y);
+            break;
+        }
+    }
+
+    map.draw();
 }
 
 function initSampleMap() {
-
     let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
-    map.draw();
 
     let rootTile = new WaterTile(map, null, 1, 7);
     rootTile.addNextWaterTile(Direction.RIGHT)
@@ -113,22 +136,23 @@ function initSampleMap() {
         .addNextWaterTile(Direction.UP)
         .addNextWaterTile(Direction.RIGHT);
 
-
-
     let waterTile1 = map.tiles[8 - 1][6 - 1];
     let tree1 = waterTile1.addChild(TileType.TREE, Direction.UP);
     tree1.addChild(TileType.TREE, Direction.LEFT).addChild(TileType.TREE, Direction.DOWN);
     tree1.addChild(TileType.TREE, Direction.BRIDGE);
-    let waterTile2 = map.tiles[5 - 1][9 - 1];
-    let bridgeTile = new BridgeTile(map, null, 5, 8, false);
+
+    let bridge_x = 3;
+    let bridge_y = 13;
+    if (BridgeTile.isBridgeLegal(map, bridge_x, bridge_y)) {
+        let bridgeTile = new BridgeTile(map, null, bridge_x, bridge_y);
+    }
+    console.log(map.tiles);
     map.draw();
 }
 
-
-
 function generateFlora() {
-    let populateAbove = getRandomTrueOrFalse();
-    let populateBelow = getRandomTrueOrFalse();
+    let populateAbove = randomTrueOrFalse();
+    let populateBelow = randomTrueOrFalse();
 
     if (populateAbove) {
 
@@ -139,11 +163,5 @@ function generateFlora() {
     }
 }
 
-// generateWaterPath();
-// drawTiles();
-// showGrid();
-
-
-// let map = new Map(canvas, 25, 20);
-// map.draw();
-initSampleMap();
+// initSampleMap();
+generateWaterPath();
