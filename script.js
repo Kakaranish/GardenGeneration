@@ -6,6 +6,159 @@ const canvas = document.getElementById('canvas');
 canvas.width = 0;
 canvas.height = 0;
 
+
+// ---  A* ALGORITHM  ----------------------------------------------
+
+function heuristic(point, goal) {
+    let dx = Math.abs(point.x - goal.x);
+    let dy = Math.abs(point.y - goal.y);
+    return dx + dy;
+}
+
+function getPointNeighbours(map, point) {
+    let neighbours = [];
+    let tentative_neighbours = [{ "x": point.x, "y": point.y - 1 },
+    { "x": point.x + 1, "y": point.y }, { "x": point.x, "y": point.y + 1 },
+    { "x": point.x - 1, "y": point.y }]
+
+    tentative_neighbours.forEach(tentative_neighbour => {
+        if (tentative_neighbour.x < 1 || tentative_neighbour.x > MAP_WIDTH ||
+            tentative_neighbour.y < 1 || tentative_neighbour.y > MAP_HEIGHT) {
+            return;
+        }
+        if (map.tiles[tentative_neighbour.x - 1][tentative_neighbour.y] !== undefined) {
+            return;
+        }
+
+        neighbours.push(tentative_neighbour);
+    });
+
+    return neighbours;
+}
+
+function findLowestFScoreInOpenSet(openSet, fScoreArray) {
+    let mapped = openSet.map((point) => {
+        return {
+            "x": point.x,
+            "y": point.y,
+            "fScore": fScoreArray[point.x - 1][point.y - 1].value
+        };
+    });
+
+    const min = mapped.reduce(function (prev, current) {
+        return (prev.fScore < current.fScore) ? prev : current
+    });
+
+    return min;
+}
+
+function setCameFromPoint(cameFromArray, point) {
+    let foundIndex = cameFromArray.findIndex(function (cameFromPoint) {
+        return cameFromPoint.x === point.x && cameFromPoint.y === point.y;
+    });
+    if (foundIndex === -1) {
+        cameFromArray.push(point);
+    } else {
+        cameFromArray[foundIndex] = point;
+    }
+}
+
+function removePointFromArray(arr, point){
+    let foundIndex = arr.findIndex(function (arrPoint) {
+        return arrPoint.x === point.x && arrPoint.y === point.y;
+    });
+    arr.splice(foundIndex, 1);
+}
+
+function isPointInArray(arr, point){
+    let foundIndex = arr.findIndex(function (arrPoint) {
+        return arrPoint.x === point.x && arrPoint.y === point.y;
+    });
+
+    return foundIndex !== -1;
+}
+
+function getInitScoreArray(){
+    let arr = new Array(this.width)
+    for (let i = 0; i < MAP_WIDTH; i++) {
+        arr[i] = new Array(MAP_HEIGHT);
+        for (let j = 0; j < MAP_HEIGHT; j++) {
+            arr[i][j] = {
+                "x": i,
+                "y": j,
+                "value": Infinity
+            };
+        }
+    }
+    return arr;
+}
+
+function findPath(map, start_point, goal) {
+    if (map.tiles[start_point.x - 1][start_point.y - 1] !== undefined) {
+        console.log("Find path failure - can't start in " +
+            start_point.x + "," + start_point.y + ".");
+        return null;
+    }
+    
+    let cameFrom = [];
+    let openSet = [start_point];
+    let gScore = getInitScoreArray();
+    let fScore = getInitScoreArray();
+    
+    gScore[start_point.x - 1][start_point.y - 1].value = 0;
+    fScore[start_point.x - 1][start_point.y - 1] = heuristic(start_point, goal);
+
+    while (openSet.length > 0) {
+        let current = findLowestFScoreInOpenSet(openSet, fScore);
+        if (current.x == goal.x && current.y == goal.y) {
+            cameFrom.push({
+                "x": current.x,
+                "y": current.y
+            });
+            return cameFrom;
+        }
+
+        removePointFromArray(openSet, current);
+
+        let neighbours = getPointNeighbours(map, current);
+        neighbours.forEach(neighbour => {
+            let tentative_gScore = gScore[current.x - 1][current.y - 1].value
+                + heuristic(current, neighbour);
+
+            if (tentative_gScore < gScore[neighbour.x - 1][neighbour.y - 1].value) {
+                if(isPointInArray(cameFrom, current) == false){
+                    cameFrom.push({
+                        "x": current.x,
+                        "y": current.y
+                    });
+                }
+                
+                gScore[neighbour.x - 1][neighbour.y - 1].value = tentative_gScore;
+                fScore[neighbour.x - 1][neighbour.y - 1].value =
+                    tentative_gScore + heuristic(neighbour, goal);
+
+                let isNeighbourInOpenSet = isPointInArray(openSet, neighbour);
+                if (isNeighbourInOpenSet === false) {
+                    openSet.push(neighbour);
+                }
+            }
+        });
+    }
+
+    console.log("Open set is empty - failure.");
+    return null;
+}
+
+// --- END OF A* ALGORITHM  ---------------------- 
+
+
+function drawPathFromPointToBridge(map, point) {
+
+}
+
+
+
+
 function generateWaterPath() {
     const break_size = 3;
     let init_y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
@@ -97,6 +250,23 @@ function generateWaterPath() {
         }
     }
 
+    let start_point = {
+        "x": 1,
+        "y": MAP_HEIGHT
+    };
+    // let bridge_point = {
+    //     "x": map.bridge.x,
+    //     "y": map.bridge.y
+    // };
+
+    let bridge_point = {
+        "x": MAP_WIDTH,
+        "y": MAP_HEIGHT
+    };
+    let path = findPath(map, start_point, bridge_point);
+    console.log("----  PATH  ----");
+    console.log(path);
+
     // Generate path (from bottom to bridge)
     // let path_coords = {};
     // console.log(map.bridge);
@@ -113,9 +283,10 @@ function generateWaterPath() {
 
     // let pathTile = new Tile(map, null, TileType.PATH, path_x, path_y);
 
-    findShortestPath(map);
+    // findShortestPath(map);
     map.draw();
 }
+
 
 function findShortestPath(map) {
     let path_starts_from_left = randomTrueOrFalse();
@@ -138,7 +309,7 @@ function findShortestPath(map) {
 
         if (currentCoords.x == 1 || currentCoords.x == map.width ||
             currentCoords.y == 1 || currentCoords.y == map.height) {
-                break;
+            break;
         }
 
         while (true) {
@@ -168,7 +339,7 @@ function findShortestPath(map) {
             // if (map.tiles[newCoords.x - 1][newCoords.y - 1] !== undefined) {
             //     continue;
             // }
-            if(PathTile.isPathLegal(map, newCoords.x, newCoords.y) == false){
+            if (PathTile.isPathLegal(map, newCoords.x, newCoords.y) == false) {
                 continue;
             }
             currentCoords = newCoords;
