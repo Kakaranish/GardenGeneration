@@ -107,14 +107,25 @@ function generateWaterPath() {
     // };
 
     let bridge_point = {
-        "x": MAP_WIDTH,
-        "y": MAP_HEIGHT
+        "x": 17,
+        "y": MAP_HEIGHT - 7
     };
 
+    // let bridge_point = {
+    //     "x": MAP_WIDTH,
+    //     "y": MAP_HEIGHT
+    // };
+
     let pathFinder = new PathFinder(map);
-    let path = pathFinder.findPath(start_point, bridge_point);
+    // let path = pathFinder.findPath(start_point, bridge_point);
+    let path = pathFinder.findPathToBridge(start_point);
+    let flattenPath = path.flat().filter(x => x !== undefined);
+
+    flattenPath.forEach(path => {
+        new PathTile(map, null, path.x, path.y);
+    });
     console.log("----  PATH  ----");
-    console.log(path);
+    console.log(flattenPath);
     map.draw();
 }
 
