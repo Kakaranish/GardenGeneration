@@ -14,77 +14,38 @@ class PathFinder {
             "x": this.map.bridge.x,
             "y": this.map.bridge.y
         }
-        console.log("Bridge");
-        console.log(bridge);
 
-        let cameFrom = [];
-        let cameFrom2 = new Array(this.map.width)
-        for (let i = 0; i < this.map.width; i++) {
-            cameFrom2[i] = new Array(this.map.height);
-            for (let j = 0; j < this.map.height; j++) {
-                cameFrom2[i][j] = undefined;
-            }
-        }
-        let openSet = [{
-            "x": from_point.x,
-            "y": from_point.y,
-            "score": this.heuristic(from_point, bridge)
-        }];
+        from_point.fScore = 0;
+        let cameFrom = get2dArray(this.map.width, this.map.height, undefined);
+        let openSet = [from_point];
         let gScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
         let fScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
-
-
         gScore[from_point.x - 1][from_point.y - 1].score = 0;
         fScore[from_point.x - 1][from_point.y - 1].score = this.heuristic(from_point, bridge);
-        // console.log(this.heuristic(from_point, bridge));
 
         while (openSet.length > 0) {
             let current = PathFinder.findLowestScoreInArray(openSet);
-            console.log(openSet.slice());
-            // console.log(current);
-
             if (this.isInBridgeNeighbourhood(current)) {
-                cameFrom.push({
-                    "x": current.x,
-                    "y": current.y
-                });
-                cameFrom2.unshift({
-                    "x": current.x,
-                    "y": current.y
-                });
-                return cameFrom2;
-                // return cameFrom;
+                cameFrom[bridge.x - 1][bridge.y - 1] = current;
+                return PathFinder.getPathFromPathMap(cameFrom, from_point, bridge);
             }
 
             PathFinder.removePointFromArray(openSet, current);
 
-
             let neighbours = this.getPointEmptyNeighbours(current);
-            // console.log(neighbours);
-
             neighbours.forEach(neighbour => {
                 let tentative_gScore = gScore[current.x - 1][current.y - 1].score
                     + this.heuristic(current, neighbour); //always 1
-                // console.log(this.heuristic(current, neighbour));
-                // console.log(gScore[neighbour.x - 1][neighbour.y - 1].score);
-                // console.log(gScore[neighbour.x - 1][neighbour.y - 1])
                 if (tentative_gScore < gScore[neighbour.x - 1][neighbour.y - 1].score) {
-                    // if(PathFinder.isPointInArray(cameFrom, neighbour))
-                    cameFrom2[neighbour.x - 1][neighbour.y - 1] = current;
-                    cameFrom.push({
-                        "x": neighbour.x,
-                        "y": neighbour.y
-                    });
-                    // if (PathFinder.isPointInArray(cameFrom, neighbour) === false) { // TODO: Validate
-                    // }
                     gScore[neighbour.x - 1][neighbour.y - 1].score = tentative_gScore;
 
                     let newFScore = tentative_gScore + this.heuristic(neighbour, bridge);
                     fScore[neighbour.x - 1][neighbour.y - 1].score = newFScore;
                     neighbour.score = newFScore;
 
-                    let isNeighbourInOpenSet = PathFinder.isPointInArray(openSet, neighbour);
-                    if (isNeighbourInOpenSet === false) {
+                    cameFrom[neighbour.x - 1][neighbour.y - 1] = current;
+
+                    if (PathFinder.isPointInArray(openSet, neighbour) === false) {
                         openSet.push(neighbour);
                     }
                 }
@@ -108,9 +69,9 @@ class PathFinder {
         let openSet = [from_point];
         let gScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
         let fScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
-
         gScore[from_point.x - 1][from_point.y - 1].score = 0;
         fScore[from_point.x - 1][from_point.y - 1] = this.heuristic(from_point, to_point);
+
         while (openSet.length > 0) {
             let current = PathFinder.findLowestScoreInArray(openSet);
             if (current.x === to_point.x && current.y === to_point.y) {
@@ -123,7 +84,6 @@ class PathFinder {
             neighbours.forEach(neighbour => {
                 let tentative_gScore = gScore[current.x - 1][current.y - 1].score
                     + this.heuristic(current, neighbour);
-
                 if (tentative_gScore < gScore[neighbour.x - 1][neighbour.y - 1].score) {
                     gScore[neighbour.x - 1][neighbour.y - 1].score = tentative_gScore;
                     
@@ -210,7 +170,6 @@ class PathFinder {
             neighbours.push(tentative_neighbour);
         });
 
-        // console.log(neighbours);
         return neighbours;
     }
 
