@@ -34,12 +34,16 @@ class PathFinder {
 
             let neighbours = this.getPointEmptyNeighbours(current);
             neighbours.forEach(neighbour => {
+                let heuristic = this.heuristic(current, neighbour)
+                    + this.heuristicDeviation(current, neighbour, from_point);
                 let tentative_gScore = gScore[current.x - 1][current.y - 1].score
-                    + this.heuristic(current, neighbour); //always 1
+                    + heuristic;
                 if (tentative_gScore < gScore[neighbour.x - 1][neighbour.y - 1].score) {
                     gScore[neighbour.x - 1][neighbour.y - 1].score = tentative_gScore;
-
-                    let newFScore = tentative_gScore + this.heuristic(neighbour, bridge);
+                    
+                    heuristic = this.heuristic(current, bridge)
+                        + this.heuristicDeviation(current, bridge, from_point);
+                    let newFScore = tentative_gScore + heuristic;
                     fScore[neighbour.x - 1][neighbour.y - 1].score = newFScore;
                     neighbour.score = newFScore;
 
@@ -62,9 +66,9 @@ class PathFinder {
                 from_point.x + "," + from_point.y + ".");
             return null;
         }
-        
+
         from_point.fScore = 0;
-        
+
         let cameFrom = get2dArray(this.map.width, this.map.height, undefined);
         let openSet = [from_point];
         let gScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
@@ -82,15 +86,19 @@ class PathFinder {
 
             let neighbours = this.getPointEmptyNeighbours(current);
             neighbours.forEach(neighbour => {
+                let heuristic = this.heuristic(current, neighbour)
+                + this.heuristicDeviation(current, neighbour, from_point);
                 let tentative_gScore = gScore[current.x - 1][current.y - 1].score
-                    + this.heuristic(current, neighbour);
+                    + heuristic;
                 if (tentative_gScore < gScore[neighbour.x - 1][neighbour.y - 1].score) {
                     gScore[neighbour.x - 1][neighbour.y - 1].score = tentative_gScore;
-                    
+
+                    heuristic = this.heuristic(current, to_point)
+                        + this.heuristicDeviation(current, to_point, from_point);
                     let newFScore = tentative_gScore + this.heuristic(neighbour, to_point);
                     fScore[neighbour.x - 1][neighbour.y - 1].score = newFScore;
                     neighbour.score = newFScore;
-                    
+
                     cameFrom[neighbour.x - 1][neighbour.y - 1] = current;
 
                     if (PathFinder.isPointInArray(openSet, neighbour) === false) {
@@ -104,12 +112,27 @@ class PathFinder {
         return null;
     }
 
-    static getPathFromPathMap(pathMap, start_point, end_point){
+    heuristic(point, goal) {
+        let dx = Math.abs(point.x - goal.x);
+        let dy = Math.abs(point.y - goal.y);
+        return dx + dy;
+    }
+
+    heuristicDeviation(current, goal, start) {
+        let dx1 = current.x - goal.x;
+        let dy1 = current.y - goal.y;
+        let dx2 = start.x - goal.x;
+        let dy2 = start.y - goal.y;
+        let cross = Math.abs(dx1 * dy2 - dx2 * dy1);
+        return cross * 0.001;
+    }
+
+    static getPathFromPathMap(pathMap, start_point, end_point) {
         let path = [];
         let prev = pathMap[end_point.x - 1][end_point.y - 1];
         path.push(prev);
-        while(true){
-            if(prev.x === start_point.x && prev.y === start_point.y){
+        while (true) {
+            if (prev.x === start_point.x && prev.y === start_point.y) {
                 break;
             }
             prev = pathMap[prev.x - 1][prev.y - 1]
@@ -129,12 +152,6 @@ class PathFinder {
             }
         }
         return false;
-    }
-
-    heuristic(point, goal) {
-        let dx = Math.abs(point.x - goal.x);
-        let dy = Math.abs(point.y - goal.y);
-        return dx + dy;
     }
 
     getPointNonEmptyTileNeighbours(point) {
