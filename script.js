@@ -103,8 +103,8 @@ function generateWaterPath() {
     };
 
     let pathFinder = new PathFinder(map);
-    let ficitousObstacles = [{"x": 5, "y": MAP_HEIGHT},
-        {"x": 5, "y": MAP_HEIGHT - 1}]
+    let ficitousObstacles = [{ "x": 5, "y": MAP_HEIGHT },
+    { "x": 5, "y": MAP_HEIGHT - 1 }]
     let path = pathFinder.findPathToBridge(start_point, ficitousObstacles);
     // console.log(path);
     path.forEach(tile => {
@@ -114,7 +114,7 @@ function generateWaterPath() {
 
     start_point.x = MAP_WIDTH;
     path = pathFinder.findPathToBridge(start_point);
-    for(let i=0; i<path.length-1;i++){
+    for (let i = 0; i < path.length - 1; i++) {
         let tile = path[0];
         new PathTile(map, null, tile.x, tile.y);
     }
@@ -130,7 +130,45 @@ function generateWaterPath() {
         new PathTile(map, null, tile.x, tile.y);
     });
 
+    // console.log(map.waterTiles);
+    countTilesAboveBrook(map);
     map.draw();
+}
+
+function countTilesAboveBrook(map) {
+    for (let col = 0; col < map.width; col++) {
+        let firstWaterTileIndex = map.tiles[col].findIndex(tile => {
+            return tile !== undefined && (tile.tileType === TileType.WATER
+                || tile.tileType === TileType.BRIDGE);
+        });
+
+
+        // console.log(map.tiles[col]);
+        // console.log(map.tiles[col]);
+        let emptyTilesCount = firstWaterTileIndex -
+            map.tiles[col].filter(function (value, index) {
+                return value.tileType !== undefined && index < firstWaterTileIndex;
+            }).length;
+        if(emptyTilesCount == 0){
+            console.log(map.tiles[col]);
+        }
+        console.log(emptyTilesCount);
+        // console.log(emptyTilesCount);
+    }
+}
+
+function countTilesBelowBrook(map) {
+    for (let col = 0; col < map.width; col++) {
+
+        let waterTilesCount = map.tiles[col].reduce((count, value) => {
+            return count + (value.tileType === TileType.WATER);
+        }, 0);
+        let firstWaterTileIndex = map.tiles[col].findIndex(tile => {
+            return tile !== undefined && tile.tileType === TileType.WATER;
+        });
+
+        console.log(firstWaterTileIndex);
+    }
 }
 
 

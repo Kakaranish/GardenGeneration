@@ -1,8 +1,6 @@
 class BridgeTile extends Tile {
     constructor(map, parent, x, y) {
         super(map, parent, TileType.BRIDGE, x, y);
-        let other_tile = this.map.tiles[x - 1][y - 1]; // ?????
-        this.childs.push(other_tile);
         this.map.bridge = this;
     }
 
@@ -26,7 +24,8 @@ class BridgeTile extends Tile {
     isHorizontal() {
         let tile_type_above = this.map.getTileType(this.x, this.y - 1);
         let tile_type_below = this.map.getTileType(this.x, this.y + 1);
-        if (tile_type_above && tile_type_below) {
+        if (tile_type_above === TileType.WATER 
+            && tile_type_below === TileType.WATER) {
             return false;
         }
         return true;
@@ -39,7 +38,7 @@ class BridgeTile extends Tile {
 
         let canvas_x = (this.x - 1) * TILE_SIZE;
         let canvas_y = (this.y - 1) * TILE_SIZE;
-        let isHorizontal = this.isHorizontal;
+        let isHorizontal = this.isHorizontal();
         let local_context = this.map.context;
         function drawImageActualSize() {
             if (isHorizontal === false) {
