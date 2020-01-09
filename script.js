@@ -111,6 +111,25 @@ function generateWaterPath() {
         new PathTile(map, null, tile.x, tile.y);
     });
 
+
+    start_point.x = MAP_WIDTH;
+    path = pathFinder.findPathToBridge(start_point);
+    for(let i=0; i<path.length-1;i++){
+        let tile = path[0];
+        new PathTile(map, null, tile.x, tile.y);
+    }
+    path.forEach(tile => {
+        new PathTile(map, null, tile.x, tile.y);
+    });
+
+    start_point.x = Math.floor(MAP_WIDTH / 2);
+    start_point.y = 1;
+    path = pathFinder.findPathToBridge(start_point, ficitousObstacles);
+    // console.log(path);
+    path.forEach(tile => {
+        new PathTile(map, null, tile.x, tile.y);
+    });
+
     map.draw();
 }
 

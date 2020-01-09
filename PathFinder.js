@@ -29,6 +29,10 @@ class PathFinder {
                 cameFrom[bridge.x - 1][bridge.y - 1] = current;
                 return PathFinder.getPathFromPathMap(cameFrom, from_point, bridge);
             }
+            if(this.isInOtherPathTileNeighbourhood(current)){
+                cameFrom[bridge.x - 1][bridge.y - 1] = current;
+                return PathFinder.getPathFromPathMap(cameFrom, from_point, bridge);
+            }
 
             PathFinder.removePointFromArray(openSet, current);
 
@@ -40,7 +44,7 @@ class PathFinder {
                     + heuristic;
                 if (tentative_gScore < gScore[neighbour.x - 1][neighbour.y - 1].score) {
                     gScore[neighbour.x - 1][neighbour.y - 1].score = tentative_gScore;
-                    
+
                     heuristic = this.heuristic(current, bridge)
                         + this.heuristicDeviation(current, bridge, from_point);
                     let newFScore = tentative_gScore + heuristic;
@@ -80,13 +84,17 @@ class PathFinder {
             if (current.x === to_point.x && current.y === to_point.y) {
                 return PathFinder.getPathFromPathMap(cameFrom, from_point, to_point);
             }
+            if(this.isInOtherPathTileNeighbourhood(current)){
+                cameFrom[bridge.x - 1][bridge.y - 1] = current;
+                return PathFinder.getPathFromPathMap(cameFrom, from_point, to_point);
+            }
 
             PathFinder.removePointFromArray(openSet, current);
 
             let neighbours = this.getPointEmptyNeighbours(current, fictiousObstacles);
             neighbours.forEach(neighbour => {
                 let heuristic = this.heuristic(current, neighbour)
-                + this.heuristicDeviation(current, neighbour, from_point);
+                    + this.heuristicDeviation(current, neighbour, from_point);
                 let tentative_gScore = gScore[current.x - 1][current.y - 1].score
                     + heuristic;
                 if (tentative_gScore < gScore[neighbour.x - 1][neighbour.y - 1].score) {
@@ -153,6 +161,17 @@ class PathFinder {
         return false;
     }
 
+    isInOtherPathTileNeighbourhood(point){
+        let nonEmptyNeighbours = this.getPointNonEmptyTileNeighbours(point);
+        for (let i = 0; i < nonEmptyNeighbours.length; i++) {
+            let neighbour = nonEmptyNeighbours[i];
+            if (neighbour.tileType === TileType.PATH) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     getPointNonEmptyTileNeighbours(point) {
         let neighbours = [];
         let tentative_neighbours = PathFinder.getTentativeNeighbours(point);
@@ -184,7 +203,7 @@ class PathFinder {
                 return;
             }
 
-            if(PathFinder.isPointInArray(fictiousObstacles, tentative_neighbour)){
+            if (PathFinder.isPointInArray(fictiousObstacles, tentative_neighbour)) {
                 return;
             }
 
