@@ -3,7 +3,7 @@ class PathFinder {
         this.map = map;
     }
 
-    findPathToBridge(from_point) {
+    findPathToBridge(from_point, fictiousObstacles = []) {
         if (this.map.tiles[from_point.x - 1][from_point.y - 1] !== undefined) {
             console.log("Path finding failure - can't start in " +
                 from_point.x + "," + from_point.y + ".");
@@ -32,7 +32,7 @@ class PathFinder {
 
             PathFinder.removePointFromArray(openSet, current);
 
-            let neighbours = this.getPointEmptyNeighbours(current);
+            let neighbours = this.getPointEmptyNeighbours(current, fictiousObstacles);
             neighbours.forEach(neighbour => {
                 let heuristic = this.heuristic(current, neighbour)
                     + this.heuristicDeviation(current, neighbour, from_point);
@@ -60,7 +60,7 @@ class PathFinder {
         return null;
     }
 
-    findPath(from_point, to_point) {
+    findPath(from_point, to_point, fictiousObstacles = []) {
         if (this.map.tiles[from_point.x - 1][from_point.y - 1] !== undefined) {
             console.log("Path finding failure - can't start in " +
                 from_point.x + "," + from_point.y + ".");
@@ -72,7 +72,6 @@ class PathFinder {
         let cameFrom = get2dArray(this.map.width, this.map.height, undefined);
         let openSet = [from_point];
         let gScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
-        let fScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
         gScore[from_point.x - 1][from_point.y - 1].score = 0;
         fScore[from_point.x - 1][from_point.y - 1] = this.heuristic(from_point, to_point);
 
@@ -84,7 +83,7 @@ class PathFinder {
 
             PathFinder.removePointFromArray(openSet, current);
 
-            let neighbours = this.getPointEmptyNeighbours(current);
+            let neighbours = this.getPointEmptyNeighbours(current, fictiousObstacles);
             neighbours.forEach(neighbour => {
                 let heuristic = this.heuristic(current, neighbour)
                 + this.heuristicDeviation(current, neighbour, from_point);
@@ -171,7 +170,7 @@ class PathFinder {
         return neighbours;
     }
 
-    getPointEmptyNeighbours(point) {
+    getPointEmptyNeighbours(point, fictiousObstacles = []) {
         let neighbours = [];
         let tentative_neighbours = PathFinder.getTentativeNeighbours(point);
 
@@ -180,9 +179,15 @@ class PathFinder {
                 tentative_neighbour.y < 1 || tentative_neighbour.y > this.map.height) {
                 return;
             }
+
             if (this.map.tiles[tentative_neighbour.x - 1][tentative_neighbour.y - 1] !== undefined) {
                 return;
             }
+
+            if(PathFinder.isPointInArray(fictiousObstacles, tentative_neighbour)){
+                return;
+            }
+
 
             neighbours.push(tentative_neighbour);
         });

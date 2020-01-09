@@ -103,7 +103,9 @@ function generateWaterPath() {
     };
 
     let pathFinder = new PathFinder(map);
-    let path = pathFinder.findPathToBridge(start_point);
+    let ficitousObstacles = [{"x": 5, "y": MAP_HEIGHT},
+        {"x": 5, "y": MAP_HEIGHT - 1}]
+    let path = pathFinder.findPathToBridge(start_point, ficitousObstacles);
     // console.log(path);
     path.forEach(tile => {
         new PathTile(map, null, tile.x, tile.y);
