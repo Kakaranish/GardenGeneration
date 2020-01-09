@@ -23,3 +23,14 @@ function randomTrueOrFalse() {
 function randomInt(start, end) {
     return Math.floor(Math.random() * (end - start + 1)) + start;
 }
+
+function get2dArray(width, height, defaultValue) {
+    let arr = new Array(width)
+    for (let i = 0; i < width; i++) {
+        arr[i] = new Array(height);
+        for (let j = 0; j < height; j++) {
+            arr[i][j] = defaultValue;
+        }
+    }
+    return arr;
+}

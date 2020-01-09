@@ -117,16 +117,44 @@ function generateWaterPath() {
     // };
 
     let pathFinder = new PathFinder(map);
-    // let path = pathFinder.findPath(start_point, bridge_point);
-    let path = pathFinder.findPathToBridge(start_point);
+    let path = pathFinder.findPath(start_point, bridge_point);
+    // let path = pathFinder.findPathToBridge(start_point);
     let flattenPath = path.flat().filter(x => x !== undefined);
 
     flattenPath.forEach(path => {
         new PathTile(map, null, path.x, path.y);
     });
     console.log("----  PATH  ----");
-    console.log(flattenPath);
+    console.log(path);
     map.draw();
+}
+
+
+function pathFindingTest(){
+    let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
+    let pathFinder = new PathFinder(map);
+
+
+    let start_point = {"x": 1, "y": map.height};
+    let end_point = {"x": 13, "y": 8};
+
+    
+    
+    new WaterTile(map, null, 13, 9);
+
+    // new WaterTile(map, null, 11, 18);
+
+    for(let i = 4; i <= 17; i++){
+        new WaterTile(map, null, i, 18);
+    }
+
+    let path = pathFinder.findPath(start_point, end_point);
+    // console.log(path);
+    path.forEach(tile => {
+        new PathTile(map, null, tile.x, tile.y);
+    });
+    let pathMap = pathFinder.findPath(start_point, end_point);
+    new Tile(map, null, TileType.TREE, end_point.x, end_point.y);
 }
 
 function initSampleMap() {
@@ -193,4 +221,5 @@ function generateFlora() {
 }
 
 // initSampleMap();
-generateWaterPath();
+// generateWaterPath();
+pathFindingTest();
