@@ -6,18 +6,9 @@ const canvas = document.getElementById('canvas');
 canvas.width = 0;
 canvas.height = 0;
 
-Object.defineProperty(Array.prototype, 'flat', {
-    value: function (depth = 1) {
-        return this.reduce(function (flat, toFlatten) {
-            return flat.concat((Array.isArray(toFlatten) && (depth > 1)) ? toFlatten.flat(depth - 1) : toFlatten);
-        }, []);
-    }
-})
 
 function generateWaterPath() {
-    const break_size = 4;
-    const minDistanceFromEdge = 3;
-    let init_y = Math.floor(Math.random() * (MAP_HEIGHT - 2 * minDistanceFromEdge)) + (1 + minDistanceFromEdge);
+    let init_y = Math.floor(Math.random() * (MAP_HEIGHT - 2 * MIN_DISTANCE_FROM_EDGE)) + (1 + MIN_DISTANCE_FROM_EDGE);
     let breaks_num = Math.floor(Math.random() * 3) + 4;
     let max_movement = Math.floor(MAP_WIDTH / breaks_num) + 2;
 
@@ -30,11 +21,11 @@ function generateWaterPath() {
             break;
         }
 
-        let reserved_movements_capacity = (breaks_num - i) * break_size;
+        let reserved_movements_capacity = (breaks_num - i) * BREAK_SIZE;
         let movement = 0;
         do {
-            movement = Math.floor(Math.random() * (max_movement - break_size))
-                + break_size;
+            movement = Math.floor(Math.random() * (max_movement - BREAK_SIZE))
+                + BREAK_SIZE;
         } while (remaining_movement - movement < reserved_movements_capacity);
         horizontal_movements.push(movement);
         remaining_movement -= movement;
@@ -60,16 +51,16 @@ function generateWaterPath() {
         let maxYMovement = 0;
         let isMovementUp = randomTrueOrFalse();
         if (isMovementUp) {
-            maxYMovement = prevTile.y - minDistanceFromEdge;
+            maxYMovement = prevTile.y - MIN_DISTANCE_FROM_EDGE;
             if (maxYMovement <= 1) {
                 isMovementUp = false;
-                maxYMovement = MAP_HEIGHT - prevTile.y - minDistanceFromEdge;
+                maxYMovement = MAP_HEIGHT - prevTile.y - MIN_DISTANCE_FROM_EDGE;
             }
         } else {
-            maxYMovement = MAP_HEIGHT - prevTile.y - minDistanceFromEdge;
+            maxYMovement = MAP_HEIGHT - prevTile.y - MIN_DISTANCE_FROM_EDGE;
             if (maxYMovement <= 1) {
                 isMovementUp = true;
-                maxYMovement = prevTile.y - minDistanceFromEdge;
+                maxYMovement = prevTile.y - MIN_DISTANCE_FROM_EDGE;
             }
         }
 
@@ -322,5 +313,6 @@ function generateFlora() {
 }
 
 // initSampleMap();
-generateWaterPath();
+// generateWaterPath();
+MapGenerator.generate(canvas);
 // pathFindingTest();
