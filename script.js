@@ -87,7 +87,6 @@ function generateWaterPath() {
         }
     }
 
-    console.log(map.waterTiles);
     let matching_water_tiles = map.waterTiles.flat().filter(function (tile) {
         return tile.x >= water_tiles_intervals.x_interval.left &&
             tile.x <= water_tiles_intervals.x_interval.right;
@@ -140,43 +139,49 @@ function generateWaterPath() {
     });
 
     // console.log(map.waterTiles);
-    countTilesAboveBrook(map);
+    // let emptyTilesAboveBrook = countTilesAboveBrook(map);
+    // console.log("Empty tiles above brook = " + emptyTilesAboveBrook);
+    countTilesBelowBrook(map);
     map.draw();
 }
 
 function countTilesAboveBrook(map) {
+    let totalEmptyTilesCount = 0;
     for (let col = 0; col < map.width; col++) {
         let firstWaterTileIndex = map.tiles[col].findIndex(tile => {
             return tile !== undefined && (tile.tileType === TileType.WATER
                 || tile.tileType === TileType.BRIDGE);
         });
 
-
-        // console.log(map.tiles[col]);
-        // console.log(map.tiles[col]);
         let emptyTilesCount = firstWaterTileIndex -
             map.tiles[col].filter(function (value, index) {
                 return value.tileType !== undefined && index < firstWaterTileIndex;
             }).length;
-        if(emptyTilesCount == 0){
-            console.log(map.tiles[col]);
-        }
-        console.log(emptyTilesCount);
-        // console.log(emptyTilesCount);
+	console.log(emptyTilesCount);
+	totalEmptyTilesCount += emptyTilesCount;
     }
+    
+    return totalEmptyTilesCount;
 }
 
 function countTilesBelowBrook(map) {
     for (let col = 0; col < map.width; col++) {
-
+	let firstWaterTileIndex = map.tiles[col].findIndex(tile => {
+            return tile !== undefined && (tile.tileType === TileType.WATER
+                || tile.tileType === TileType.BRIDGE);
+        });
         let waterTilesCount = map.tiles[col].reduce((count, value) => {
             return count + (value.tileType === TileType.WATER);
         }, 0);
-        let firstWaterTileIndex = map.tiles[col].findIndex(tile => {
-            return tile !== undefined && tile.tileType === TileType.WATER;
-        });
+	let lastWaterTileIndex = firstWaterTileIndex + waterTilesCount;
+	
+	let nonEmptyTilesCount = map.tiles[col].reduce((count, value, index) => {
+	     return count + (value !== undefined && index > lastWaterTileIndex);
+	}, 0);
+	let emptyTilesCount = map.tiles[col].length - lastWaterTileIndex - nonEmptyTilesCount;
+	
 
-        console.log(firstWaterTileIndex);
+        console.log(nonEmptyTilesCount);
     }
 }
 
