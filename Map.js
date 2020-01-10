@@ -84,4 +84,9 @@ class Map {
         this.drawTiles();
         this.drawGrid();
     }
+
+    isPointLegal(point) {
+        return point.x >= 1 && point.x <= this.width
+            && point.y >= 1 && point.y <= this.height;
+    }
 }

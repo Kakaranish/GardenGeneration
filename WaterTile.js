@@ -57,6 +57,7 @@ class WaterTile extends Tile {
         }
 
         let child = new WaterTile(this.map, this, childCoords.x, childCoords.y);
+        this.childs.push(child);
         return child;
     }
 }
