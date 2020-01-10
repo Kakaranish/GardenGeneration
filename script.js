@@ -15,8 +15,9 @@ Object.defineProperty(Array.prototype, 'flat', {
 })
 
 function generateWaterPath() {
-    const break_size = 3;
-    let init_y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
+    const break_size = 4;
+    const minDistanceFromEdge = 3;
+    let init_y = Math.floor(Math.random() * (MAP_HEIGHT - 2 * minDistanceFromEdge)) + (1 + minDistanceFromEdge);
     let breaks_num = Math.floor(Math.random() * 3) + 4;
     let max_movement = Math.floor(MAP_WIDTH / breaks_num) + 2;
 
@@ -43,11 +44,12 @@ function generateWaterPath() {
     let rootTile = new WaterTile(map, null, 1, init_y);
     let prevTile = rootTile;
 
+
     for (let i = 0; i < horizontal_movements.length; i++) {
         let movements_num = horizontal_movements[i];
-        let j = i == 0 ? 2 : 1;
+
         // Generate water tiles in x axis
-        for (j; j <= movements_num; j++) {
+        for (let j = (i == 0) ? 2 : 1; j <= movements_num; j++) {
             let newTile = null;
             do {
                 newTile = prevTile.addNextWaterTile(Direction.RIGHT);
@@ -55,19 +57,19 @@ function generateWaterPath() {
             prevTile = newTile;
         }
 
-        let isMovementUp = Math.round(Math.random());
         let maxYMovement = 0;
+        let isMovementUp = randomTrueOrFalse();
         if (isMovementUp) {
-            maxYMovement = prevTile.y - 3;
-            if (maxYMovement < 1) {
+            maxYMovement = prevTile.y - minDistanceFromEdge;
+            if (maxYMovement <= 1) {
                 isMovementUp = false;
-                maxYMovement = MAP_HEIGHT - prevTile.y - 2;
+                maxYMovement = MAP_HEIGHT - prevTile.y - minDistanceFromEdge;
             }
         } else {
-            maxYMovement = MAP_HEIGHT - prevTile.y - 2;
-            if (maxYMovement < 1) {
+            maxYMovement = MAP_HEIGHT - prevTile.y - minDistanceFromEdge;
+            if (maxYMovement <= 1) {
                 isMovementUp = true;
-                maxYMovement = prevTile.y - 3;
+                maxYMovement = prevTile.y - minDistanceFromEdge;
             }
         }
 
@@ -78,7 +80,7 @@ function generateWaterPath() {
             prevTile = prevTile.addNextWaterTile(movementDirection);
         }
     }
-
+    // return;
     // Generate bridge
     let water_tiles_intervals = {
         "x_interval": {
@@ -105,52 +107,60 @@ function generateWaterPath() {
         }
     }
 
-    let start_point = {
-        "x": 1,
-        "y": MAP_HEIGHT
-    };
 
     let pathFinder = new PathFinder(map);
+    let startPoint = {};
+    let path = null;
     let fictiousObstacles = getFictiousObstaclesAlongBrook(map);
 
-    let path = pathFinder.findPathToBridge(start_point, fictiousObstacles);
-    path.forEach(tile => {
-        new PathTile(map, null, tile.x, tile.y);
+    let tilesAboveBrookCount = countTilesAboveBrook(map);
+    let tilesBelowBrookCount = countTilesBelowBrook(map);
+    let countAboveIsGreater = tilesAboveBrookCount > tilesBelowBrookCount;
+    let countRatio = countAboveIsGreater
+        ? tilesBelowBrookCount / tilesAboveBrookCount
+        : tilesAboveBrookCount / tilesBelowBrookCount;
+
+        
+    console.log("Count ratio = " + countRatio);
+    let pathsNum = {};
+    if (countRatio > 0.8) {
+        pathsNum = {
+            "higher": [ 1, map.width],
+            "lower": [ 1, map.width]
+        };
+    }
+    else if (countRatio > 0.45 && countRatio <= 0.8) {
+        pathsNum = {
+            "higher": [ 1, map.width],
+            "lower": [ Math.floor(map.width / 2)]
+        };
+    }
+    else if (countRatio <= 0.45) {
+        pathsNum = {
+            "higher": [ 1, map.width, Math.floor(map.width / 2)],
+            "lower": [ map.width ]
+        };
+    }
+
+    // Draw higher
+    startPoint.y = countAboveIsGreater ? 1 : map.height;
+    pathsNum.higher.forEach(x => {
+        startPoint.x = x;
+        path = pathFinder.findPathToBridge(startPoint, fictiousObstacles);
+        path.forEach(tile => {
+            new PathTile(map, null, tile.x, tile.y);
+        });
     });
 
-
-    start_point.x = MAP_WIDTH;
-    path = pathFinder.findPathToBridge(start_point, fictiousObstacles);
-    path.forEach(tile => {
-        new PathTile(map, null, tile.x, tile.y);
+    startPoint.y = countAboveIsGreater ? map.height : 1;
+    pathsNum.lower.forEach(x => {
+        startPoint.x = x;
+        path = pathFinder.findPathToBridge(startPoint, fictiousObstacles);
+        path.forEach(tile => {
+            new PathTile(map, null, tile.x, tile.y);
+        });
     });
 
-    start_point.x = Math.floor(MAP_WIDTH / 2);
-    start_point.y = 1;
-
-    path = pathFinder.findPathToBridge(start_point, fictiousObstacles);
-    path.forEach(tile => {
-        new PathTile(map, null, tile.x, tile.y);
-    });
-
-    // console.log(map.waterTiles);
-    // let emptyTilesAboveBrook = countTilesAboveBrook(map);
-    // console.log("Empty tiles above brook = " + emptyTilesAboveBrook);
-    // countTilesBelowBrook(map);
-    // console.log(map.waterTiles.flat().filter(val => val !== undefined));
-
-    // let waterTileXD = map.waterTiles.flat().filter(val => val !== undefined)[0];
-    // waterTileXD.hasChildInDirection(Direction.RIGHT, TileType.WATER);
-    // console.logt
-
-    // let bridge = map.bridge;
-    
-    // console.log(fictiousObstacles);
-    // fictiousObstacles.forEach(obstacle => {
-    //     if(obstacle.x !== bridge.x || obstacle.y !== bridge.y){
-    //         new PathTile(map, null, obstacle.x, obstacle.y);
-    //     }
-    // });
     map.draw();
 }
 
@@ -174,9 +184,10 @@ function getFictiousObstaclesAlongBrook(map) {
         "x": map.bridge.x,
         "y": map.bridge.y
     };
+    console.log(bridge);
 
-    let filteredFictiousObstacles =  fictiousObstacles.filter(obstacle => 
-         (obstacle.x < bridge.x - 2) || (obstacle.x > bridge.x + 2) || (obstacle.x < bridge.y - 2) || (obstacle.y > bridge.y + 2)
+    let filteredFictiousObstacles = fictiousObstacles.filter(obstacle =>
+        (obstacle.x < bridge.x - 2) || (obstacle.x > bridge.x + 2) || (obstacle.y < bridge.y - 2) || (obstacle.y > bridge.y + 2)
     );
     return filteredFictiousObstacles;
 }
@@ -193,7 +204,6 @@ function countTilesAboveBrook(map) {
             map.tiles[col].filter(function (value, index) {
                 return value.tileType !== undefined && index < firstWaterTileIndex;
             }).length;
-        console.log(emptyTilesCount);
         totalEmptyTilesCount += emptyTilesCount;
     }
 
@@ -201,6 +211,7 @@ function countTilesAboveBrook(map) {
 }
 
 function countTilesBelowBrook(map) {
+    let totalEmptyTilesCount = 0;
     for (let col = 0; col < map.width; col++) {
         let firstWaterTileIndex = map.tiles[col].findIndex(tile => {
             return tile !== undefined && (tile.tileType === TileType.WATER
@@ -215,12 +226,10 @@ function countTilesBelowBrook(map) {
             return count + (value !== undefined && index > lastWaterTileIndex);
         }, 0);
         let emptyTilesCount = map.tiles[col].length - lastWaterTileIndex - nonEmptyTilesCount;
-
-
-        console.log(nonEmptyTilesCount);
+        totalEmptyTilesCount += emptyTilesCount;
     }
+    return totalEmptyTilesCount;
 }
-
 
 function pathFindingTest() {
     let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
