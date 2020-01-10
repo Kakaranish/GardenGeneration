@@ -6,14 +6,6 @@ const canvas = document.getElementById('canvas');
 canvas.width = 0;
 canvas.height = 0;
 
-Object.defineProperty(Array.prototype, 'flat', {
-    value: function(depth = 1) {
-      return this.reduce(function (flat, toFlatten) {
-        return flat.concat((Array.isArray(toFlatten) && (depth>1)) ? toFlatten.flat(depth-1) : toFlatten);
-      }, []);
-    }
-})
-
 function generateWaterPath() {
     const break_size = 3;
     let init_y = Math.floor(Math.random() * (MAP_HEIGHT - 6)) + 3;
