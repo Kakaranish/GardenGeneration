@@ -11,26 +11,30 @@ class Tile {
     }
 
     getChildCoords(direction) {
-        let child_x = this.x;
-        let child_y = this.y;
+        let childCoords = {
+            "x": this.x,
+            "y": this.y
+        };
 
         switch (direction) {
             case Direction.LEFT:
-                child_x--;
+                childCoords.x--;
                 break;
             case Direction.RIGHT:
-                child_x++;
+                childCoords.x++;
                 break;
             case Direction.UP:
-                child_y--;
+                childCoords.y--;
                 break;
             case Direction.DOWN:
-                child_y++;
+                childCoords.y++;
                 break;
         }
 
-        return [child_x, child_y];
+        return childCoords;
     }
+
+    
 
     addChild(tileType, direction) {
         if (this.childs.some(child => child.direction === direction)) {
@@ -38,18 +42,22 @@ class Tile {
             return null;
         }
 
-        let child_coords = this.getChildCoords(direction);
-        let child_x = child_coords[0];
-        let child_y = child_coords[1];
-
-        if (this.map.tiles[child_x - 1][child_y - 1] !== undefined) {
-            console.log("Tile on " + child_x + "," + child_y + " already exists.");
+        let childCoords = this.getChildCoords(direction);
+        if (this.map.tiles[childCoords.x - 1][childCoords.y - 1] !== undefined) {
+            console.log("Tile on " + childCoords.x + "," + childCoords.y + " already exists.");
             return null;
         }
 
-        let child = new Tile(this.map, this, tileType, child_x, child_y);
+        let child = new Tile(this.map, this, tileType, childCoords.x, childCoords.y);
         return child;
     }
+
+    // hasChildOn(direction){
+    //     let childCoords = this.getChildCoords(direction);
+    //     let childX = childCoords[0];
+    //     let childY = childCoords[1];
+    //     return this.childs.some(child => child.x === childX && child.y === childY);
+    // }
 
     draw() {
         const image = new Image(TILE_SIZE, TILE_SIZE);
