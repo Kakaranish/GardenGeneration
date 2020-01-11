@@ -1,4 +1,3 @@
-
 const BREAK_SIZE = 4;
 const MIN_DISTANCE_FROM_EDGE = 3;
 const MIN_VERTICAL_MOVEMENT = 3;
@@ -6,24 +5,14 @@ const MIN_VERTICAL_MOVEMENT = 3;
 class MapGenerator {
     static generate(canvas) {
         let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
-        let waterTiles = MapGenerator.generateBrook(map);
-        waterTiles.forEach(tile => {
-            new WaterTile(map, null, tile.x, tile.y);
-        });
+        let brook = MapGenerator.generateBrook(map);
+        MapGenerator.addGeneratedBrookToMap(map, brook);
 
         let bridge = MapGenerator.generateBridge(map);
-        new BridgeTile(map, null, bridge.x, bridge.y);
+        MapGenerator.addGeneratedBridgeToMap(map, bridge);
 
         let paths = MapGenerator.generatePaths(map);
-        paths.forEach(path => {
-            for (let i = 0; i < path.length; i++) {
-                let tile = path[i];
-                if (map.tiles[tile.x - 1][tile.y - 1] !== undefined) {
-                    break;
-                }
-                new PathTile(map, null, tile.x, tile.y);
-            }
-        });
+        MapGenerator.addGeneratedPathsToMap(map, paths);
 
         map.draw();
     }
@@ -115,6 +104,28 @@ class MapGenerator {
         });
 
         return paths;
+    }
+
+    static addGeneratedBrookToMap(map, brook) {
+        brook.forEach(tile => {
+            new WaterTile(map, null, tile.x, tile.y);
+        });
+    }
+
+    static addGeneratedBridgeToMap(map, bridge) {
+        new BridgeTile(map, null, bridge.x, bridge.y);
+    }
+
+    static addGeneratedPathsToMap(map, paths) {
+        paths.forEach(path => {
+            for (let i = 0; i < path.length; i++) {
+                let tile = path[i];
+                if (map.tiles[tile.x - 1][tile.y - 1] !== undefined) {
+                    break;
+                }
+                new PathTile(map, null, tile.x, tile.y);
+            }
+        });
     }
 
     static randomHorizontalMovementsLenghts(emptyMap) {
