@@ -89,4 +89,69 @@ class Map {
         return point.x >= 1 && point.x <= this.width
             && point.y >= 1 && point.y <= this.height;
     }
+
+    isBridgeLegal(x, y) {
+        let tile_type = this.getTileType(x, y);
+        if (tile_type !== TileType.WATER) {
+            return false;
+        }
+
+        let tile_type_above = this.getTileType(x, y - 1);
+        let tile_type_on_right = this.getTileType(x + 1, y);
+        let tile_type_below = this.getTileType(x, y + 1);
+        let tile_type_on_left = this.getTileType(x - 1, y);
+
+        if ((tile_type_above && tile_type_on_right) || (tile_type_on_right && tile_type_below)
+            || (tile_type_below && tile_type_on_left) || (tile_type_on_left && tile_type_above)) {
+            return false;
+        }
+        return true;
+    }
+
+    // Validation if brook?
+    countTilesAboveBrook() {
+        let totalEmptyTilesCount = 0;
+        for (let col = 0; col < this.width; col++) {
+            let firstWaterTileIndex = this.tiles[col].findIndex(tile => {
+                return tile !== undefined && (tile.tileType === TileType.WATER
+                    || tile.tileType === TileType.BRIDGE);
+            });
+            if (firstWaterTileIndex === -1) {
+                return null;
+            }
+
+            let emptyTilesCount = firstWaterTileIndex -
+                this.tiles[col].filter(function (value, index) {
+                    return value.tileType !== undefined && index < firstWaterTileIndex;
+                }).length;
+            totalEmptyTilesCount += emptyTilesCount;
+        }
+
+        return totalEmptyTilesCount;
+    }
+
+    countTilesBelowBrook() {
+        let totalEmptyTilesCount = 0;
+        for (let col = 0; col < this.width; col++) {
+            let firstWaterTileIndex = this.tiles[col].findIndex(tile => {
+                return tile !== undefined && (tile.tileType === TileType.WATER
+                    || tile.tileType === TileType.BRIDGE);
+            });
+            if (firstWaterTileIndex === -1) {
+                return null;
+            }
+
+            let waterTilesCount = this.tiles[col].reduce((count, value) => {
+                return count + (value.tileType === TileType.WATER);
+            }, 0);
+            let lastWaterTileIndex = firstWaterTileIndex + waterTilesCount;
+
+            let nonEmptyTilesCount = this.tiles[col].reduce((count, value, index) => {
+                return count + (value !== undefined && index > lastWaterTileIndex);
+            }, 0);
+            let emptyTilesCount = this.tiles[col].length - lastWaterTileIndex - nonEmptyTilesCount;
+            totalEmptyTilesCount += emptyTilesCount;
+        }
+        return totalEmptyTilesCount;
+    }
 }

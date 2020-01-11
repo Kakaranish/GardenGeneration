@@ -8,13 +8,76 @@ class MapGenerator {
     static generate(canvas) {
         let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
         let waterTiles = MapGenerator.generateBrook(map);
-        // console.log(waterTiles);
         waterTiles.forEach(tile => {
             new WaterTile(map, null, tile.x, tile.y);
         });
 
+        let bridge = MapGenerator.generateBridge(map);
+        new BridgeTile(map, null, bridge.x, bridge.y);
         map.draw();
 
+        MapGenerator.generatePaths(map);
+    }
+
+    static generatePaths(mapWithBrookAndBridge) {
+        let map = mapWithBrookAndBridge;
+        let pathFinder = new PathFinder(map);
+        let pathsStartPoints = MapGenerator.getPathsStartPoints(map);
+        console.log(pathsStartPoints);
+    }
+
+    static getPathsStartPoints(mapWithBrookAndBridge) {
+        let map = mapWithBrookAndBridge;
+        let tileCountAboveBrook = map.countTilesAboveBrook();
+        let tileCountBelowBrook = map.countTilesBelowBrook();
+        let countRatio = tileCountAboveBrook > tileCountBelowBrook
+            ? tileCountBelowBrook / tileCountAboveBrook
+            : tileCountAboveBrook / tileCountBelowBrook;
+
+        let largerAreaY = tileCountAboveBrook > tileCountBelowBrook ?
+            1 : map.height;
+        let smallerAreaY = tileCountAboveBrook < tileCountBelowBrook ?
+            1 : map.height;
+
+
+        if (countRatio > 0.8) {
+            return {
+                "largerArea": [
+                    { "x": 1, "y": largerAreaY },
+                    { "x": map.width, "y": largerAreaY }
+                ],
+                "smallerArea": [
+                    { "x": 1, "y": smallerAreaY },
+                    { "x": map.width, "y": smallerAreaY }
+                ]
+            };
+        }
+        else if (countRatio > 0.45 && countRatio <= 0.8) {
+            return {
+                "largerArea": [
+                    { "x": 1, "y": largerAreaY },
+                    { "x": map.width, "y": largerAreaY }
+                ],
+                "smallerArea": [
+                    { "x": Math.floor(map.width / 2), "y": smallerAreaY }
+                ]
+            };
+        }
+        else if (countRatio <= 0.45) {
+            return {
+                "largerArea": [
+                    { "x": 1, "y": largerAreaY },
+                    { "x": map.width, "y": largerAreaY },
+                    { "x": Math.floor(map.width / 2), "y": largerAreaY }
+                ],
+                "smallerArea": [
+                    {
+                        "x": randomTrueOrFalse() ? 1 : map.width,
+                        "y": smallerAreaY
+                    }
+                ]
+            };
+        }
     }
 
     static generateBrook(emptyMap) {
@@ -28,8 +91,8 @@ class MapGenerator {
         let waterTiles = [currentPosition];
 
         let horizontalMovements = MapGenerator.randomHorizontalMovementsLenghts(emptyMap);
-        horizontalMovements.forEach((horizontalMovementPoints, horizontalMovementNum) => {
-            for (let j = (horizontalMovementNum == 0) ? 2 : 1; j <= horizontalMovementPoints; j++) {
+        horizontalMovements.forEach((horizontalMovementLength, horizontalMovementNum) => {
+            for (let j = (horizontalMovementNum == 0) ? 2 : 1; j <= horizontalMovementLength; j++) {
                 currentPosition = {
                     "x": currentPosition.x + 1,
                     "y": currentPosition.y
@@ -41,10 +104,10 @@ class MapGenerator {
                 return;
             }
 
-            let verticalMovementPoints = MapGenerator.randomVerticalMovement(
+            let verticalMovementLength = MapGenerator.randomVerticalMovementLength(
                 emptyMap, currentPosition);
-            let isMovementUp = verticalMovementPoints < 0 ? true : false;
-            for (let j = 0; j < Math.abs(verticalMovementPoints); j++) {
+            let isMovementUp = verticalMovementLength < 0 ? true : false;
+            for (let j = 0; j < Math.abs(verticalMovementLength); j++) {
                 currentPosition = {
                     "x": currentPosition.x,
                     "y": currentPosition.y + (isMovementUp ? -1 : 1)
@@ -54,6 +117,29 @@ class MapGenerator {
         });
 
         return waterTiles;
+    }
+
+    static generateBridge(mapWithBrook) {
+        let min_x = Math.floor(mapWithBrook.width / 2) - Math.floor(mapWithBrook.width / 4);
+        let max_x = Math.floor(mapWithBrook.width / 2) + Math.floor(mapWithBrook.width / 4)
+
+        let matchingWaterTiles = mapWithBrook.waterTiles.flat().filter(tile =>
+            tile !== undefined && tile.x >= min_x && tile.x <= max_x);
+        if (matchingWaterTiles.length === 0) {
+            return null;
+        }
+
+        while (true) {
+            let randomWaterTileIndex = randomInt(0, matchingWaterTiles.length - 1);
+            let randomWaterTile = matchingWaterTiles[randomWaterTileIndex];
+            let isBridgeLegal = mapWithBrook.isBridgeLegal(randomWaterTile.x, randomWaterTile.y);
+            if (isBridgeLegal) {
+                return {
+                    "x": randomWaterTile.x,
+                    "y": randomWaterTile.y
+                };
+            }
+        }
     }
 
     static randomHorizontalMovementsLenghts(emptyMap) {
@@ -81,7 +167,7 @@ class MapGenerator {
         return horizontalMovements;
     }
 
-    static randomVerticalMovement(emptyMap, currentPosition) {
+    static randomVerticalMovementLength(emptyMap, currentPosition) {
         let maxVerticalMovementLength = 0;
         let isMovementUp = randomTrueOrFalse();
         if (isMovementUp) {

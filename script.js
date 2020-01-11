@@ -116,26 +116,26 @@ function generateWaterPath() {
     let pathsNum = {};
     if (countRatio > 0.8) {
         pathsNum = {
-            "higher": [ 1, map.width],
-            "lower": [ 1, map.width]
+            "top": [ 1, map.width],
+            "bottom": [ 1, map.width]
         };
     }
     else if (countRatio > 0.45 && countRatio <= 0.8) {
         pathsNum = {
-            "higher": [ 1, map.width],
-            "lower": [ Math.floor(map.width / 2)]
+            "top": [ 1, map.width],
+            "bottom": [ Math.floor(map.width / 2)]
         };
     }
     else if (countRatio <= 0.45) {
         pathsNum = {
-            "higher": [ 1, map.width, Math.floor(map.width / 2)],
-            "lower": [ map.width ]
+            "top": [ 1, map.width, Math.floor(map.width / 2)],
+            "bottom": [ map.width ]
         };
     }
 
-    // Draw higher
+    // Draw top
     startPoint.y = countAboveIsGreater ? 1 : map.height;
-    pathsNum.higher.forEach(x => {
+    pathsNum.top.forEach(x => {
         startPoint.x = x;
         path = pathFinder.findPathToBridge(startPoint, fictiousObstacles);
         path.forEach(tile => {
@@ -144,7 +144,7 @@ function generateWaterPath() {
     });
 
     startPoint.y = countAboveIsGreater ? map.height : 1;
-    pathsNum.lower.forEach(x => {
+    pathsNum.bottom.forEach(x => {
         startPoint.x = x;
         path = pathFinder.findPathToBridge(startPoint, fictiousObstacles);
         path.forEach(tile => {
