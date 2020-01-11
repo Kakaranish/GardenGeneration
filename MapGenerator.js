@@ -17,7 +17,7 @@ class MapGenerator {
 
         let floraAlongBrook = MapGenerator.generateFloraAlongBrook(map);
         MapGenerator.addGeneratedFloraAlongBrookToMap(map, floraAlongBrook);
-        
+
         return map;
     }
 
@@ -139,7 +139,7 @@ class MapGenerator {
 
     static addGeneratedBrookToMap(map, brook) {
         let currentWaterTile = new WaterTile(map, null, brook[0].x, brook[0].y);
-        for(let i = 1; i < brook.length; i++){
+        for (let i = 1; i < brook.length; i++) {
             let nextWaterTileDirection = currentWaterTile.getNeighbourDirection(brook[i]);
             currentWaterTile = currentWaterTile.addNextWaterTile(nextWaterTileDirection);
         }
@@ -151,18 +151,25 @@ class MapGenerator {
 
     static addGeneratedPathsToMap(map, paths) {
         paths.forEach(path => {
-            for (let i = 0; i < path.length; i++) {
-                
-                let tile = path[i];
-                if (map.tiles[tile.x - 1][tile.y - 1] !== undefined) {
+            let currentPathTile = new PathTile(map, null, path[0].x, path[0].y);
+
+            for (let i = 1; i < path.length; i++) {
+                let nextTileCoords = path[i];
+                let nextTileDirection = currentPathTile.getNeighbourDirection(nextTileCoords);
+                let nextPathTileTileType = map.getTileType(nextTileCoords.x, nextTileCoords.y);
+                if (nextPathTileTileType === TileType.PATH ||
+                    nextPathTileTileType === TileType.BRIDGE) {
+                    let nextTile = map.tiles[nextTileCoords.x - 1][nextTileCoords.y - 1];
+                    currentPathTile.childs.push(nextTile);
                     break;
                 }
-                new PathTile(map, null, tile.x, tile.y);
+
+                currentPathTile = currentPathTile.addChild(TileType.PATH, nextTileDirection);
             }
         });
     }
 
-    static addGeneratedFloraAlongBrookToMap(map, floraAlongBrook){
+    static addGeneratedFloraAlongBrookToMap(map, floraAlongBrook) {
         floraAlongBrook.forEach(floraTile => {
             let floraType = randomFloraType();
             new Tile(map, null, floraType, floraTile.x, floraTile.y);
