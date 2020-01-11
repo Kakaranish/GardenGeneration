@@ -154,4 +154,10 @@ class Map {
         }
         return totalEmptyTilesCount;
     }
+
+    getEmptyTilesCount(){
+        let totalTilesCount = this.width * this.height;
+        let nonEmptyTilesCount = this.tiles.filter(tile => tile !== undefined).length;
+        return totalTilesCount - nonEmptyTilesCount;
+    }
 }

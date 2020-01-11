@@ -8,7 +8,6 @@ class MapGenerator {
         let brook = MapGenerator.generateBrook(map);
         MapGenerator.addGeneratedBrookToMap(map, brook);
 
-        // return;
         let bridge = MapGenerator.generateBridge(map);
         MapGenerator.addGeneratedBridgeToMap(map, bridge);
 
@@ -17,6 +16,9 @@ class MapGenerator {
 
         let floraAlongBrook = MapGenerator.generateFloraAlongBrook(map);
         MapGenerator.addGeneratedFloraAlongBrookToMap(map, floraAlongBrook);
+
+        let otherFlora = MapGenerator.generateOtherFlora(map);
+        MapGenerator.addGeneratedOtherFloraToMap(map, otherFlora);
 
         return map;
     }
@@ -119,7 +121,6 @@ class MapGenerator {
         let flora = [];
         let floraCount = Math.floor(0.4 * brookLength * 2);
         for (let i = 1; i <= floraCount; i++) {
-
             while (true) {
                 let randomTentativePointIndex = randomInt(0, tentativePoints.length - 1);
                 let randomTentativePoint = tentativePoints[randomTentativePointIndex];
@@ -128,8 +129,40 @@ class MapGenerator {
                 if (map.tiles[randomTentativePoint.x - 1][randomTentativePoint.y - 1] !== undefined) {
                     continue;
                 }
-                else {
-                    flora.push(randomTentativePoint);
+                
+                randomTentativePoint.floraType = randomFloraType([
+                    TileType.ROCK, TileType.FLOWER1, TileType.FLOWER2
+                ]);
+                flora.push(randomTentativePoint);
+                break;
+            }
+        }
+        return flora;
+    }
+
+    static generateOtherFlora(mapWithFlora) {
+        let randomSet = [
+            TileType.ROCK,
+            TileType.TREE, TileType.TREE, TileType.TREE,
+            TileType.FLOWER1, TileType.FLOWER1,
+            TileType.FLOWER2, TileType.FLOWER2
+        ];
+        let map = mapWithFlora;
+        let emptyTilesCount = map.getEmptyTilesCount();
+        let floraToRandomCount = randomInt(
+            Math.floor(emptyTilesCount / 2) - Math.floor(emptyTilesCount / 4),
+            Math.floor(emptyTilesCount / 2) + Math.floor(emptyTilesCount / 4));
+        let flora = [];
+        for (let i = 1; i <= floraToRandomCount; i++) {
+            while (true) {
+                let randomTileCoords = {
+                    "x": randomInt(1, map.width),
+                    "y": randomInt(1, map.height)
+                };
+                if (map.getTileType(randomTileCoords.x, randomTileCoords.y) === null) {
+                    let floraType = randomFloraType(randomSet);
+                    randomTileCoords.floraType = floraType;
+                    flora.push(randomTileCoords);
                     break;
                 }
             }
@@ -171,9 +204,14 @@ class MapGenerator {
 
     static addGeneratedFloraAlongBrookToMap(map, floraAlongBrook) {
         floraAlongBrook.forEach(floraTile => {
-            let floraType = randomFloraType();
-            new Tile(map, null, floraType, floraTile.x, floraTile.y);
+            new Tile(map, null, floraTile.floraType, floraTile.x, floraTile.y);
         });
+    }
+
+    static addGeneratedOtherFloraToMap(map, flora) {
+        flora.forEach(floraTile => {
+            new Tile(map, null, floraTile.floraType, floraTile.x, floraTile.y);
+        })
     }
 
     static randomHorizontalMovementsLenghts(emptyMap) {

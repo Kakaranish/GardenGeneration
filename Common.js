@@ -52,16 +52,15 @@ function removePointFromArray(arr, point) {
     }
 }
 
-function randomFloraType(){
-    let randomIndex = randomInt(1, 4);
-    switch(randomIndex){
-        case 1:
-            return TileType.TREE;
-        case 2:
-            return TileType.ROCK;
-        case 3:
-            return TileType.FLOWER1;
-        case 4:
-            return TileType.FLOWER2;
+function randomFloraType(randomSet = undefined) {
+    if (randomSet === undefined) {
+        randomSet = [
+            TileType.ROCK,
+            TileType.TREE,
+            TileType.FLOWER1,
+            TileType.FLOWER2
+        ];
     }
+    let randomIndex = randomInt(0, randomSet.length - 1);
+    return randomSet[randomIndex];
 }
