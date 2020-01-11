@@ -58,4 +58,5 @@ function initSampleMap() {
 }
 
 
-MapGenerator.generate(canvas);
+let map = MapGenerator.generate(canvas);
+map.draw();

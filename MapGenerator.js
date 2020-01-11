@@ -13,8 +13,8 @@ class MapGenerator {
 
         let paths = MapGenerator.generatePaths(map);
         MapGenerator.addGeneratedPathsToMap(map, paths);
-
-        map.draw();
+        
+        return map;
     }
 
     static generateBrook(emptyMap) {
