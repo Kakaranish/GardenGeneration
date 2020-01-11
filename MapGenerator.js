@@ -21,15 +21,15 @@ class MapGenerator {
         let startY = randomInt(1 + MIN_DISTANCE_FROM_EDGE,
             emptyMap.height - MIN_DISTANCE_FROM_EDGE);
 
-        let horizontalMovements = MapGenerator.getHorizontalMovements(emptyMap);
-        console.log(horizontalMovements);
         let currentPosition = {
             "x": 1,
             "y": startY
         };
         let waterTiles = [currentPosition];
-        horizontalMovements.forEach((movements_num, i) => {
-            for (let j = (i == 0) ? 2 : 1; j <= movements_num; j++) {
+
+        let horizontalMovements = MapGenerator.randomHorizontalMovementsLenghts(emptyMap);
+        horizontalMovements.forEach((horizontalMovementPoints, horizontalMovementNum) => {
+            for (let j = (horizontalMovementNum == 0) ? 2 : 1; j <= horizontalMovementPoints; j++) {
                 currentPosition = {
                     "x": currentPosition.x + 1,
                     "y": currentPosition.y
@@ -37,11 +37,14 @@ class MapGenerator {
                 waterTiles.push(currentPosition);
             }
 
-            let maxVerticalMovement = MapGenerator.getMaxVerticalMovement(emptyMap, currentPosition);
-            let isMovementUp = maxVerticalMovement < 0;
-            let movement = randomInt(MIN_VERTICAL_MOVEMENT, Math.abs(maxVerticalMovement));
+            if (horizontalMovementNum === horizontalMovements.length - 1) {
+                return;
+            }
 
-            for (let j = 0; j < movement; j++) {
+            let verticalMovementPoints = MapGenerator.randomVerticalMovement(
+                emptyMap, currentPosition);
+            let isMovementUp = verticalMovementPoints < 0 ? true : false;
+            for (let j = 0; j < Math.abs(verticalMovementPoints); j++) {
                 currentPosition = {
                     "x": currentPosition.x,
                     "y": currentPosition.y + (isMovementUp ? -1 : 1)
@@ -53,46 +56,55 @@ class MapGenerator {
         return waterTiles;
     }
 
-    static getHorizontalMovements(emptyMap){
-        let breaks_num = randomInt(4, 7);
-        let maxHorizontalMovement = Math.floor(emptyMap.width / breaks_num) + 2;
-        let remaining_movement = emptyMap.width;
-        let horizontal_movements = [];
-        for (let i = 1; i <= breaks_num; i++) {
-            if (i == breaks_num) {
-                horizontal_movements.push(remaining_movement);
+    static randomHorizontalMovementsLenghts(emptyMap) {
+        let breaksCount = randomInt(4, 7);
+        let maxHorizontalMovementLength = Math.floor(emptyMap.width / breaksCount) + 2;
+        let remainingMovementPoints = emptyMap.width;
+        let horizontalMovements = [];
+        for (let i = 1; i <= breaksCount; i++) {
+            if (i === breaksCount) {
+                horizontalMovements.push(remainingMovementPoints);
                 break;
             }
 
-            let reserved_movements_capacity = (breaks_num - i) * BREAK_SIZE;
+            let excludedMovements = (breaksCount - i) * BREAK_SIZE;
             let movement = 0;
-            do {
-                movement = randomInt(BREAK_SIZE, maxHorizontalMovement);
-            } while (remaining_movement - movement < reserved_movements_capacity);
-            horizontal_movements.push(movement);
-            remaining_movement -= movement;
+            while (true) {
+                movement = randomInt(BREAK_SIZE, maxHorizontalMovementLength);
+                if (remainingMovementPoints - movement >= excludedMovements) {
+                    break;
+                }
+            }
+            horizontalMovements.push(movement);
+            remainingMovementPoints -= movement;
         }
-        return horizontal_movements;
+        return horizontalMovements;
     }
 
-    static getMaxVerticalMovement(emptyMap, currentPosition) {
-        let maxVerticalMovement = 0;
+    static randomVerticalMovement(emptyMap, currentPosition) {
+        let maxVerticalMovementLength = 0;
         let isMovementUp = randomTrueOrFalse();
         if (isMovementUp) {
-            maxVerticalMovement = currentPosition.y - MIN_DISTANCE_FROM_EDGE;
-            if (maxVerticalMovement <= 1) {
+            maxVerticalMovementLength = currentPosition.y - MIN_DISTANCE_FROM_EDGE;
+            if (maxVerticalMovementLength <= 1) {
                 isMovementUp = false;
-                maxVerticalMovement = emptyMap.height - currentPosition.y - MIN_DISTANCE_FROM_EDGE;
+                maxVerticalMovementLength = emptyMap.height
+                    - currentPosition.y - MIN_DISTANCE_FROM_EDGE;
             }
         } else {
-            maxVerticalMovement = emptyMap.height - currentPosition.y - MIN_DISTANCE_FROM_EDGE;
-            if (maxVerticalMovement <= 1) {
+            maxVerticalMovementLength = emptyMap.height
+                - currentPosition.y - MIN_DISTANCE_FROM_EDGE;
+            if (maxVerticalMovementLength <= 1) {
                 isMovementUp = true;
-                maxVerticalMovement = currentPosition.y - MIN_DISTANCE_FROM_EDGE;
+                maxVerticalMovementLength = currentPosition.y - MIN_DISTANCE_FROM_EDGE;
             }
         }
 
-        return isMovementUp ? -1 * maxVerticalMovement : maxVerticalMovement;
+        let verticalMovementPoints = randomInt(MIN_VERTICAL_MOVEMENT,
+            Math.abs(maxVerticalMovementLength));
+        return isMovementUp
+            ? -1 * verticalMovementPoints
+            : verticalMovementPoints;
     }
 
     generateWaterPath2() {
