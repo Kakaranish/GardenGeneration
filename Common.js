@@ -6,11 +6,11 @@ var Direction = {
 };
 
 var TileType = {
-    TREE: "img/tree.png",
-    ROCK: "img/rock.png",
     WATER: "img/water.png",
     BRIDGE: "img/bridge.png",
     PATH: "img/path.png",
+    TREE: "img/tree.png",
+    ROCK: "img/rock.png",
     FLOWER1: "img/flower1.png",
     FLOWER2: "img/flower2.png"
 };
@@ -41,4 +41,27 @@ function get2dArray(width, height, defaultValue) {
         }
     }
     return arr;
+}
+
+function removePointFromArray(arr, point) {
+    let foundIndex = arr.findIndex(arrPoint => {
+        return arrPoint.x === point.x && arrPoint.y === point.y;
+    });
+    if (foundIndex !== -1) {
+        arr.splice(foundIndex, 1);
+    }
+}
+
+function randomFloraType(){
+    let randomIndex = randomInt(1, 4);
+    switch(randomIndex){
+        case 0:
+            return TileType.TREE;
+        case 1:
+            return TileType.ROCK;
+        case 2:
+            return TileType.FLOWER1;
+        case 3:
+            return TileType.FLOWER2;
+    }
 }

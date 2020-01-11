@@ -13,6 +13,9 @@ class MapGenerator {
 
         let paths = MapGenerator.generatePaths(map);
         MapGenerator.addGeneratedPathsToMap(map, paths);
+
+        let floraAlongBrook = MapGenerator.generateFloraAlongBrook(map);
+        MapGenerator.addGeneratedFloraAlongBrookToMap(map, floraAlongBrook);
         
         return map;
     }
@@ -82,7 +85,7 @@ class MapGenerator {
     static generatePaths(mapWithBrookAndBridge) {
         let map = mapWithBrookAndBridge;
         let pathFinder = new PathFinder(map);
-        let fictiousObstaclesAlongBrook = MapGenerator.getFictiousObstaclesAlongBrook(map);
+        let fictiousObstaclesAlongBrook = MapGenerator.getTilesSurroundingBrook(map);
         let pathsStartPoints = MapGenerator.getPathsStartPoints(map);
 
         let paths = [];
@@ -106,6 +109,33 @@ class MapGenerator {
         return paths;
     }
 
+    static generateFloraAlongBrook(mapWithBrookAndBridgeAndPaths) {
+        let map = mapWithBrookAndBridgeAndPaths;
+        let tentativePoints = MapGenerator.getTilesSurroundingBrook(map, false);
+        console.log(tentativePoints);
+        let brookLength = map.waterTiles.length;
+
+        let flora = [];
+        let floraCount = Math.floor(0.4 * brookLength * 2);
+        for (let i = 1; i <= floraCount; i++) {
+
+            while (true) {
+                let randomTentativePointIndex = randomInt(0, tentativePoints.length - 1);
+                let randomTentativePoint = tentativePoints[randomTentativePointIndex];
+                removePointFromArray(tentativePoints, randomTentativePoint);
+
+                if (map.tiles[randomTentativePoint.x - 1][randomTentativePoint.y - 1] !== undefined) {
+                    continue;
+                }
+                else {
+                    flora.push(randomTentativePoint);
+                    break;
+                }
+            }
+        }
+        return flora;
+    }
+
     static addGeneratedBrookToMap(map, brook) {
         brook.forEach(tile => {
             new WaterTile(map, null, tile.x, tile.y);
@@ -125,6 +155,13 @@ class MapGenerator {
                 }
                 new PathTile(map, null, tile.x, tile.y);
             }
+        });
+    }
+
+    static addGeneratedFloraAlongBrookToMap(map, floraAlongBrook){
+        floraAlongBrook.forEach(floraTile => {
+            let floraType = randomFloraType();
+            new Tile(map, null, floraType, floraTile.x, floraTile.y);
         });
     }
 
@@ -179,32 +216,32 @@ class MapGenerator {
             : verticalMovementPoints;
     }
 
-    static getFictiousObstaclesAlongBrook(map) {
+    static getTilesSurroundingBrook(map, filterAroundBridge = true) {
         let waterTiles = map.waterTiles.flat().filter(val => val !== undefined);
         let directions = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
-        let fictiousObstacles = [];
+        let surroundingTiles = [];
 
         waterTiles.forEach(tile => {
             directions.forEach(direction => {
                 if (tile.isInRelationWithOtherTile(direction, TileType.WATER) === false) {
-                    let fictiousObstacle = tile.getChildCoords(direction);
-                    if (map.isPointLegal(fictiousObstacle)) {
-                        fictiousObstacles.push(fictiousObstacle);
+                    let surroundingTile = tile.getChildCoords(direction);
+                    if (map.isPointLegal(surroundingTile)) {
+                        surroundingTiles.push(surroundingTile);
                     }
                 }
             });
         });
 
-        let bridge = {
-            "x": map.bridge.x,
-            "y": map.bridge.y
-        };
-        console.log(bridge);
-
-        let filteredFictiousObstacles = fictiousObstacles.filter(obstacle =>
-            (obstacle.x < bridge.x - 2) || (obstacle.x > bridge.x + 2) || (obstacle.y < bridge.y - 2) || (obstacle.y > bridge.y + 2)
-        );
-        return filteredFictiousObstacles;
+        if (filterAroundBridge) {
+            let bridge = {
+                "x": map.bridge.x,
+                "y": map.bridge.y
+            };
+            return surroundingTiles.filter(obstacle =>
+                (obstacle.x < bridge.x - 2) || (obstacle.x > bridge.x + 2) || (obstacle.y < bridge.y - 2) || (obstacle.y > bridge.y + 2)
+            );
+        }
+        return surroundingTiles;
     }
 
     static getPathsStartPoints(mapWithBrookAndBridge) {

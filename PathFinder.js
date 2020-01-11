@@ -32,7 +32,7 @@ class PathFinder {
                 return PathFinder.convertPathToPathMap(cameFrom, from_point, bridge);
             }
 
-            PathFinder.removePointFromArray(openSet, current);
+            removePointFromArray(openSet, current);
 
             let neighbours = this.getPointEmptyNeighbours(current, fictiousObstacles);
             neighbours.forEach(neighbour => {
@@ -218,14 +218,5 @@ class PathFinder {
 
     static isPointInArray(arr, point) {
         return arr.some(element => element.x === point.x && element.y === point.y);
-    }
-
-    static removePointFromArray(arr, point) {
-        let foundIndex = arr.findIndex(arrPoint => {
-            return arrPoint.x === point.x && arrPoint.y === point.y;
-        });
-        if (foundIndex !== -1) {
-            arr.splice(foundIndex, 1);
-        }
     }
 }
