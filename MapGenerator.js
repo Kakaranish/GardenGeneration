@@ -129,9 +129,11 @@ class MapGenerator {
                 if (map.tiles[randomTentativePoint.x - 1][randomTentativePoint.y - 1] !== undefined) {
                     continue;
                 }
-                
+
                 randomTentativePoint.floraType = randomFloraType([
-                    TileType.ROCK, TileType.FLOWER1, TileType.FLOWER2
+                    TileType.ROCK,
+                    TileType.FLOWER1,
+                    TileType.FLOWER2
                 ]);
                 flora.push(randomTentativePoint);
                 break;
@@ -150,8 +152,8 @@ class MapGenerator {
         let map = mapWithFlora;
         let emptyTilesCount = map.getEmptyTilesCount();
         let floraToRandomCount = randomInt(
-            Math.floor(emptyTilesCount / 2) - Math.floor(emptyTilesCount / 4),
-            Math.floor(emptyTilesCount / 2) + Math.floor(emptyTilesCount / 4));
+            Math.floor(emptyTilesCount / 3) - Math.floor(emptyTilesCount / 4),
+            Math.floor(emptyTilesCount / 3) + Math.floor(emptyTilesCount / 4));
         let flora = [];
         for (let i = 1; i <= floraToRandomCount; i++) {
             while (true) {
