@@ -100,4 +100,36 @@ class Tile {
         let childInDirection = childsInDirection[0];
         return childInDirection.tileType === childTileType;
     }
+
+    getNeighbourDirection(neighbourCoords) {
+        let diff = {
+            "x": neighbourCoords.x - this.x,
+            "y": neighbourCoords.y - this.y
+        };
+        let absDiff = {
+            "x": Math.abs(diff.x),
+            "y": Math.abs(diff.y)
+        }
+        if (new Set([0, 1]).has(absDiff.x) === false ||
+            new Set([0, 1]).has(absDiff.y) === false) {
+            return null;
+        }
+
+        if (absDiff.x === 1 && absDiff.y === 1) {
+            return null;
+        }
+
+        if (diff.x === -1) {
+            return Direction.LEFT;
+        }
+        else if (diff.x === 1) {
+            return Direction.RIGHT;
+        }
+        else if (diff.y === -1) {
+            return Direction.UP;
+        }
+        else if (diff.y === 1) {
+            return Direction.DOWN;
+        }
+    }
 }

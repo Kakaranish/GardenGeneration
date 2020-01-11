@@ -55,13 +55,13 @@ function removePointFromArray(arr, point) {
 function randomFloraType(){
     let randomIndex = randomInt(1, 4);
     switch(randomIndex){
-        case 0:
-            return TileType.TREE;
         case 1:
-            return TileType.ROCK;
+            return TileType.TREE;
         case 2:
-            return TileType.FLOWER1;
+            return TileType.ROCK;
         case 3:
+            return TileType.FLOWER1;
+        case 4:
             return TileType.FLOWER2;
     }
 }

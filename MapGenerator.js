@@ -8,6 +8,7 @@ class MapGenerator {
         let brook = MapGenerator.generateBrook(map);
         MapGenerator.addGeneratedBrookToMap(map, brook);
 
+        // return;
         let bridge = MapGenerator.generateBridge(map);
         MapGenerator.addGeneratedBridgeToMap(map, bridge);
 
@@ -137,9 +138,11 @@ class MapGenerator {
     }
 
     static addGeneratedBrookToMap(map, brook) {
-        brook.forEach(tile => {
-            new WaterTile(map, null, tile.x, tile.y);
-        });
+        let currentWaterTile = new WaterTile(map, null, brook[0].x, brook[0].y);
+        for(let i = 1; i < brook.length; i++){
+            let nextWaterTileDirection = currentWaterTile.getNeighbourDirection(brook[i]);
+            currentWaterTile = currentWaterTile.addNextWaterTile(nextWaterTileDirection);
+        }
     }
 
     static addGeneratedBridgeToMap(map, bridge) {
@@ -149,6 +152,7 @@ class MapGenerator {
     static addGeneratedPathsToMap(map, paths) {
         paths.forEach(path => {
             for (let i = 0; i < path.length; i++) {
+                
                 let tile = path[i];
                 if (map.tiles[tile.x - 1][tile.y - 1] !== undefined) {
                     break;
