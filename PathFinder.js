@@ -3,17 +3,17 @@ class PathFinder {
         this.map = map;
     }
 
-    findPathToBridge(from_point, fictiousObstacles = []) {
+    findPathToBridge(from_point, fictiousObstacles = [], fictiousPaths = []) {
         if (this.map.tiles[from_point.x - 1][from_point.y - 1] !== undefined) {
             console.log("Path finding failure - can't start in " +
                 from_point.x + "," + from_point.y + ".");
             return null;
         }
-
         let bridge = {
             "x": this.map.bridge.x,
             "y": this.map.bridge.y
         }
+        let fictiousPathsMap = this.getFictiousPathsMapFrom(fictiousPaths);
 
         from_point.fScore = 0;
         let cameFrom = get2dArray(this.map.width, this.map.height, undefined);
@@ -25,11 +25,9 @@ class PathFinder {
 
         while (openSet.length > 0) {
             let current = PathFinder.findLowestScoreInArray(openSet);
-            if (this.isInBridgeNeighbourhood(current)) {
-                cameFrom[bridge.x - 1][bridge.y - 1] = current;
-                return PathFinder.getPathFromPathMap(cameFrom, from_point, bridge);
-            }
-            if(this.isInOtherPathTileNeighbourhood(current)){
+            if (this.isInBridgeNeighbourhood(current) ||
+                this.isInOtherPathTileNeighbourhood(current) ||
+                this.isPointInFictiousPathTileNeighbourhood(fictiousPathsMap, current)) {
                 cameFrom[bridge.x - 1][bridge.y - 1] = current;
                 return PathFinder.getPathFromPathMap(cameFrom, from_point, bridge);
             }
@@ -84,7 +82,7 @@ class PathFinder {
             if (current.x === to_point.x && current.y === to_point.y) {
                 return PathFinder.getPathFromPathMap(cameFrom, from_point, to_point);
             }
-            if(this.isInOtherPathTileNeighbourhood(current)){
+            if (this.isInOtherPathTileNeighbourhood(current)) {
                 cameFrom[bridge.x - 1][bridge.y - 1] = current;
                 return PathFinder.getPathFromPathMap(cameFrom, from_point, to_point);
             }
@@ -161,7 +159,7 @@ class PathFinder {
         return false;
     }
 
-    isInOtherPathTileNeighbourhood(point){
+    isInOtherPathTileNeighbourhood(point) {
         let nonEmptyNeighbours = this.getPointNonEmptyTileNeighbours(point);
         for (let i = 0; i < nonEmptyNeighbours.length; i++) {
             let neighbour = nonEmptyNeighbours[i];
@@ -170,6 +168,40 @@ class PathFinder {
             }
         }
         return false;
+    }
+
+    isPointInFictiousPathTileNeighbourhood(fictiousPathsMap, point) {
+        if(fictiousPathsMap === null){
+            return false;
+        }
+
+        let tentativeNeighbours = PathFinder.getTentativeNeighbours(point);
+        for (let i = 0; i < tentativeNeighbours.length; i++) {
+            let tentativeNeighbour = tentativeNeighbours[i];
+            if(this.map.isPointLegal(tentativeNeighbour) === false){
+                continue;
+            }
+            
+            let neighbour = fictiousPathsMap[tentativeNeighbour.x - 1][tentativeNeighbour.y - 1];
+            if (neighbour !== undefined) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getFictiousPathsMapFrom(fictiousPaths) {
+        if (fictiousPaths === undefined || fictiousPaths.length === 0) {
+            return null;
+        }
+
+        let fictiousPathsMap = get2dArray(this.map.width, this.map.height, undefined);
+        let flattenFictiousPaths = fictiousPaths.flat();
+        flattenFictiousPaths.forEach(fictiousPathTile => {
+            fictiousPathsMap[fictiousPathTile.x - 1][fictiousPathTile.y - 1] =
+                fictiousPathTile;
+        });
+        return fictiousPathsMap;
     }
 
     getPointNonEmptyTileNeighbours(point) {
