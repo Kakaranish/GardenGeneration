@@ -13,7 +13,7 @@ class MapGenerator {
 
         let paths = MapGenerator.generatePaths(map);
         MapGenerator.addGeneratedPathsToMap(map, paths);
-
+        
         let floraAlongBrook = MapGenerator.generateFloraAlongBrook(map);
         MapGenerator.addGeneratedFloraAlongBrookToMap(map, floraAlongBrook);
 
@@ -115,7 +115,6 @@ class MapGenerator {
     static generateFloraAlongBrook(mapWithBrookAndBridgeAndPaths) {
         let map = mapWithBrookAndBridgeAndPaths;
         let tentativePoints = MapGenerator.getTilesSurroundingBrook(map, false);
-        console.log(tentativePoints);
         let brookLength = map.waterTiles.length;
 
         let flora = [];

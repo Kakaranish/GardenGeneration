@@ -132,4 +132,11 @@ class Tile {
             return Direction.DOWN;
         }
     }
+
+    isFloraType() {
+        return this.tileType === TileType.FLOWER1 ||
+            this.tileType === TileType.FLOWER2 ||
+            this.tileType === TileType.TREE ||
+            this.tileType === TileType.ROCK;
+    }
 }

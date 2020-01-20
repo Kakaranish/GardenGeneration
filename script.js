@@ -1,5 +1,5 @@
 const MAP_WIDTH = 30;
-const MAP_HEIGHT = 20;
+const MAP_HEIGHT = 21;
 const TILE_SIZE = 32;
 
 const canvas = document.getElementById('canvas');
@@ -60,3 +60,6 @@ function initSampleMap() {
 
 let map = MapGenerator.generate(canvas);
 map.draw();
+
+
+MapEvaluator.evaluateMapScore(map)
