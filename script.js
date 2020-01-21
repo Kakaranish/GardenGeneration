@@ -62,4 +62,4 @@ let map = MapGenerator.generate(canvas);
 map.draw();
 
 
-MapEvaluator.evaluateMapScore(map)
+// MapEvaluator.evaluateMapScore(map)
