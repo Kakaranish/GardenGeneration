@@ -60,14 +60,14 @@ class Map {
 
     drawGrid() {
         this.context.fillStyle = "#000000";
-
+        
         let x_times = Math.floor(this.canvas.width / TILE_SIZE);
         let y_times = Math.floor(this.canvas.height / TILE_SIZE);
         for (let i = 1; i <= x_times; i++) {
             let coord = i * TILE_SIZE;
             this.context.beginPath();
             this.context.moveTo(coord, 0);
-            this.context.lineTo(coord, canvas.height);
+            this.context.lineTo(coord, this.canvas.height);
             this.context.stroke();
         }
 
@@ -75,7 +75,7 @@ class Map {
             let coord = i * TILE_SIZE;
             this.context.beginPath();
             this.context.moveTo(0, coord);
-            this.context.lineTo(canvas.width, coord);
+            this.context.lineTo(this.canvas.width, coord);
             this.context.stroke();
         }
     }

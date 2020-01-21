@@ -7,14 +7,6 @@ class MapGenerator {
     
     static generate(canvas) {
         let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
-        let brook1 = MapGenerator.generateBrook(map);
-        let brook2 = MapGenerator.generateBrook(map);
-        let connectedBrooks = MapUtilities.glueBrooks(brook1, brook2);
-        console.log(connectedBrooks);
-        connectedBrooks.forEach(waterTile => {
-            new WaterTile(map, null, waterTile.x, waterTile.y);
-        });
-        return map; 
         
         let brook = MapGenerator.generateBrook(map);
         MapGenerator.addGeneratedBrookToMap(map, brook);
@@ -183,6 +175,7 @@ class MapGenerator {
     }
 
     static addGeneratedBrookToMap(map, brook) {
+        map.waterTiles2 = brook;
         let currentWaterTile = new WaterTile(map, null, brook[0].x, brook[0].y);
         for (let i = 1; i < brook.length; i++) {
             let nextWaterTileDirection = currentWaterTile.getNeighbourDirection(brook[i]);

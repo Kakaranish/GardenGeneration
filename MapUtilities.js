@@ -32,7 +32,7 @@ class MapUtilities {
 
         if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
             var reversedRightBrookHalf = [].concat(rightBrookHalf).reverse();
-
+            
             let tileIndex = 0;
             while (reversedRightBrookHalf[tileIndex].y === lastTile.y) {
                 tileIndex++;
@@ -61,8 +61,7 @@ class MapUtilities {
         }
 
         leftBrookEndPoint = leftBrookHalf.slice(-1)[0];
-
-        if (leftBrookEndPoint.y < rightBrookEndPoint.y) {
+        if (leftBrookEndPoint.y <= rightBrookEndPoint.y) {
             for (let y = leftBrookEndPoint.y; y < rightBrookEndPoint.y; y++) {
                 leftBrookHalf.push({
                     "x": leftBrookEndPoint.x,
