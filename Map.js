@@ -10,8 +10,7 @@ class Map {
         this.tiles = null;
         this.initTiles();
 
-        this.waterTiles = null;
-        this.initWaterTiles();
+        this.waterTiles = [];
 
         this.pathTiles = [];
         this.bridge = null;
@@ -28,13 +27,6 @@ class Map {
         this.tiles = new Array(this.width)
         for (let i = 0; i < this.width; i++) {
             this.tiles[i] = new Array(this.height);
-        }
-    }
-
-    initWaterTiles() {
-        this.waterTiles = new Array(this.width)
-        for (let i = 0; i < this.width; i++) {
-            this.waterTiles[i] = new Array(this.height);
         }
     }
 
@@ -67,6 +59,7 @@ class Map {
             let coord = i * TILE_SIZE;
             this.context.beginPath();
             this.context.moveTo(coord, 0);
+            this.context.lineWidth = 0.75;
             this.context.lineTo(coord, this.canvas.height);
             this.context.stroke();
         }
@@ -74,6 +67,7 @@ class Map {
         for (let i = 1; i <= y_times; i++) {
             let coord = i * TILE_SIZE;
             this.context.beginPath();
+            this.context.lineWidth = 0.75;
             this.context.moveTo(0, coord);
             this.context.lineTo(this.canvas.width, coord);
             this.context.stroke();

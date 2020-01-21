@@ -66,8 +66,8 @@ class MapGenerator {
     }
 
     static generateBridge(mapWithBrook) {
-        let min_x = Math.floor(mapWithBrook.width / 2) - Math.floor(mapWithBrook.width / 4);
-        let max_x = Math.floor(mapWithBrook.width / 2) + Math.floor(mapWithBrook.width / 4)
+        let min_x = Math.floor(mapWithBrook.width / 2);
+        let max_x = Math.floor(mapWithBrook.width / 2);
 
         let matchingWaterTiles = mapWithBrook.waterTiles.flat().filter(tile =>
             tile !== undefined && tile.x >= min_x && tile.x <= max_x);
@@ -175,7 +175,6 @@ class MapGenerator {
     }
 
     static addGeneratedBrookToMap(map, brook) {
-        map.waterTiles2 = brook;
         let currentWaterTile = new WaterTile(map, null, brook[0].x, brook[0].y);
         for (let i = 1; i < brook.length; i++) {
             let nextWaterTileDirection = currentWaterTile.getNeighbourDirection(brook[i]);
@@ -271,7 +270,7 @@ class MapGenerator {
     }
 
     static getTilesSurroundingBrook(map, filterAroundBridge = true) {
-        let waterTiles = map.waterTiles.flat().filter(val => val !== undefined);
+        let waterTiles = map.waterTiles;
         let directions = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
         let surroundingTiles = [];
 

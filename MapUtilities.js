@@ -1,4 +1,50 @@
 class MapUtilities {
+
+
+    static crossMaps(map1, map2, canvasForCrossProduct) {
+        let firstIsLeft = randomTrueOrFalse();
+        let leftMap = firstIsLeft
+            ? map1
+            : map2;
+        let rightMap = firstIsLeft
+            ? map2
+            : map1;
+
+        let crossResult = new Map(canvasForCrossProduct, MAP_WIDTH, MAP_HEIGHT);
+
+        let brook = this.glueBrooks(map1.waterTiles, map2.waterTiles, MAP_WIDTH);
+        brook.forEach(tile => {
+            new WaterTile(crossResult, null, tile.x, tile.y);
+        });
+
+        let bridge = MapGenerator.generateBridge(crossResult); //always at map center
+        MapGenerator.addGeneratedBridgeToMap(crossResult, bridge);
+
+        let paths = MapGenerator.generatePaths(crossResult);
+        MapGenerator.addGeneratedPathsToMap(crossResult, paths);
+
+
+        let leftFlora = MapUtilities.getFloraFromLeftHalfOfMap(leftMap);
+        leftFlora.forEach(floraTile => {
+            if (crossResult.tiles[floraTile.x - 1][floraTile.y - 1] === undefined) {
+                new Tile(crossResult, null, floraTile.tileType,
+                    floraTile.x, floraTile.y)
+            }
+        });
+
+        let rightFlora = MapUtilities.getFloraFromRightHalfOfMap(rightMap);
+        rightFlora.forEach(floraTile => {
+            if (crossResult.tiles[floraTile.x - 1][floraTile.y - 1] === undefined) {
+                new Tile(crossResult, null, floraTile.tileType,
+                    floraTile.x, floraTile.y)
+            }
+        });
+
+        // Take 10% of derieved flora and randomize it
+
+        return crossResult;
+    }
+
     static glueBrooks(leftBrook, rightBrook, mapWidth = MAP_WIDTH) {
         let last5WaterTiles = null;
         let lastTile = null;
@@ -32,7 +78,7 @@ class MapUtilities {
 
         if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
             var reversedRightBrookHalf = [].concat(rightBrookHalf).reverse();
-            
+
             let tileIndex = 0;
             while (reversedRightBrookHalf[tileIndex].y === lastTile.y) {
                 tileIndex++;
@@ -80,6 +126,18 @@ class MapUtilities {
 
         rightBrookHalf.reverse();
         return leftBrookHalf.concat(rightBrookHalf);
+    }
+
+    static getFloraFromLeftHalfOfMap(map) {
+        let centerIndex = Math.ceil(map.width / 2.);
+        return map.tiles.flat().filter(tile =>
+            tile !== undefined && tile.isFloraType() && tile.x <= centerIndex);
+    }
+
+    static getFloraFromRightHalfOfMap(map) {
+        let centerIndex = Math.ceil(map.width / 2.);
+        return map.tiles.flat().filter(tile =>
+            tile !== undefined && tile.isFloraType() && tile.x > centerIndex);
     }
 
     static getLeftHalfOfTheBrook(brook, mapWidth) {

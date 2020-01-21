@@ -2,7 +2,7 @@ class WaterTile extends Tile {
     constructor(map, parent, x, y) {
         super(map, parent, TileType.WATER, x, y);
 
-        this.map.waterTiles[x - 1][y - 1] = this;
+        this.map.waterTiles.push(this);
     }
 
     addNextWaterTile(direction) {
