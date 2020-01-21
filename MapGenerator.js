@@ -3,115 +3,17 @@ const MIN_DISTANCE_FROM_EDGE = 3;
 const MIN_VERTICAL_MOVEMENT = 3;
 
 class MapGenerator {
-    static getLeftHalfOfTheBrook(brook, mapWidth) {
-        let centerIndex = Math.ceil(mapWidth / 2.);
-        return brook.filter(waterTile => waterTile.x < centerIndex)
-    }
-
-    static getRightHalfOfTheBrook(brook, mapWidth) {
-        let centerIndex = Math.ceil(mapWidth / 2.);
-        return brook.filter(waterTile => waterTile.x > centerIndex)
-    }
-    static doSth(map) {
-        // Left part 
-        let brook1 = MapGenerator.generateBrook(map);
-        let leftPartOfBrook1 = MapGenerator.getLeftHalfOfTheBrook(
-            brook1, map.width);
-        let lastTile = leftPartOfBrook1.slice(-1)[0];
-
-        let last5WaterTiles = leftPartOfBrook1.slice(-5);
-        if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
-            var reversedLeftPartOfBrook = [].concat(leftPartOfBrook1).reverse();
-
-            let i = 0;
-            while (reversedLeftPartOfBrook[i].y === lastTile.y) {
-                i++;
-            }
-            lastTile = reversedLeftPartOfBrook[i - 1];
-            console.log(i);
-            while (reversedLeftPartOfBrook[i].x === lastTile.x) {
-                i++;
-            }
-
-            reversedLeftPartOfBrook = reversedLeftPartOfBrook.slice(i);
-            leftPartOfBrook1 = [].concat(reversedLeftPartOfBrook).reverse();
-
-        }
-
-        // ---------------------------------------------------------------------
-        // Right part of brook
-
-        let brook2 = MapGenerator.generateBrook(map);
-        let rightPartOfBrook2 = MapGenerator.getRightHalfOfTheBrook(
-            brook2, map.width);
-        rightPartOfBrook2.reverse();
-        lastTile = rightPartOfBrook2.slice(-1)[0];
-
-        last5WaterTiles = rightPartOfBrook2.slice(-5);
-        if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
-            var reversedLeftPartOfBrook = [].concat(rightPartOfBrook2).reverse();
-
-            let i = 0;
-            while (reversedLeftPartOfBrook[i].y === lastTile.y) {
-                i++;
-            }
-            lastTile = reversedLeftPartOfBrook[i - 1];
-            console.log(i);
-            while (reversedLeftPartOfBrook[i].x === lastTile.x) {
-                i++;
-            }
-
-            reversedLeftPartOfBrook = reversedLeftPartOfBrook.slice(i);
-            rightPartOfBrook2 = [].concat(reversedLeftPartOfBrook).reverse();
-
-        }
-
-        // Connect brooks
-
-        let leftBrookEndPoint = leftPartOfBrook1.slice(-1)[0];
-        let rightBrookAnchorPoint = rightPartOfBrook2.slice(-1)[0];
-        console.log(rightBrookAnchorPoint);
-        for (let i = leftBrookEndPoint.x; i <= rightBrookAnchorPoint.x; i++) {
-            leftPartOfBrook1.push({
-                "x": i,
-                "y": leftBrookEndPoint.y
-            });
-        }
-
-        leftBrookEndPoint = leftPartOfBrook1.slice(-1)[0];
-
-        if(leftBrookEndPoint.y < rightBrookAnchorPoint.y)
-        {
-            for (let i = leftBrookEndPoint.y; i <= rightBrookAnchorPoint.y; i++) {
-                leftPartOfBrook1.push({
-                    "x": leftBrookEndPoint.x,
-                    "y": i
-                });
-            }
-        }
-        else
-        {
-            for (let i = leftBrookEndPoint.y; i >= rightBrookAnchorPoint.y; i--) {
-                leftPartOfBrook1.push({
-                    "x": leftBrookEndPoint.x,
-                    "y": i
-                });
-            }
-        }
-        
-        leftPartOfBrook1.forEach(waterTile => {
-            new WaterTile(map, null, waterTile.x, waterTile.y);
-        });
-
-        console.log(rightPartOfBrook2);
-        rightPartOfBrook2.forEach(waterTile => {
-            new WaterTile(map, null, waterTile.x, waterTile.y);
-        });
-    }
+    
     
     static generate(canvas) {
         let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
-        MapGenerator.doSth(map);
+        let brook1 = MapGenerator.generateBrook(map);
+        let brook2 = MapGenerator.generateBrook(map);
+        let connectedBrooks = MapUtilities.glueBrooks(brook1, brook2);
+        console.log(connectedBrooks);
+        connectedBrooks.forEach(waterTile => {
+            new WaterTile(map, null, waterTile.x, waterTile.y);
+        });
         return map; 
         
         let brook = MapGenerator.generateBrook(map);
