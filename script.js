@@ -27,7 +27,7 @@ let map2 = MapGenerator.generate(canvas2);
 map2.draw();
 
 let crossResultCanvas = createCanvas();
-let crossResult = MapUtilities.crossMaps(map1, map2, crossResultCanvas);
+let crossResult = MapCrosser.crossMaps(map1, map2, crossResultCanvas);
 crossResult.draw();
 
 // MapEvaluator.evaluateMapScore(map)

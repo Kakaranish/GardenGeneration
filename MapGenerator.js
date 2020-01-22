@@ -3,8 +3,6 @@ const MIN_DISTANCE_FROM_EDGE = 3;
 const MIN_VERTICAL_MOVEMENT = 3;
 
 class MapGenerator {
-    
-    
     static generate(canvas) {
         let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
         
@@ -18,10 +16,10 @@ class MapGenerator {
         MapGenerator.addGeneratedPathsToMap(map, paths);
         
         let floraAlongBrook = MapGenerator.generateFloraAlongBrook(map);
-        MapGenerator.addGeneratedFloraAlongBrookToMap(map, floraAlongBrook);
+        MapGenerator.addGeneratedFloraToMap(map, floraAlongBrook);
 
         let otherFlora = MapGenerator.generateOtherFlora(map);
-        MapGenerator.addGeneratedOtherFloraToMap(map, otherFlora);
+        MapGenerator.addGeneratedFloraToMap(map, otherFlora);
 
         return map;
     }
@@ -206,15 +204,12 @@ class MapGenerator {
         });
     }
 
-    static addGeneratedFloraAlongBrookToMap(map, floraAlongBrook) {
-        floraAlongBrook.forEach(floraTile => {
-            new Tile(map, null, floraTile.floraType, floraTile.x, floraTile.y);
-        });
-    }
-
-    static addGeneratedOtherFloraToMap(map, flora) {
+    static addGeneratedFloraToMap(map, flora) {
         flora.forEach(floraTile => {
-            new Tile(map, null, floraTile.floraType, floraTile.x, floraTile.y);
+            if(map.tiles[floraTile.x - 1][floraTile.y - 1] === undefined)
+            {
+                new Tile(map, null, floraTile.floraType, floraTile.x, floraTile.y);
+            }
         })
     }
 
