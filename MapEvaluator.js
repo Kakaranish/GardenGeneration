@@ -58,7 +58,7 @@ class MapEvaluator {
 
     static evaluateTotalBrookDistanceFromHorizontalCentralAxis(map) {
         let totalDistance = 0;
-        for (let col = 0; col < map.width; col++) {
+        for (let col = 0; col < MAP_WIDTH; col++) {
             let waterTilesInCol = map.tiles[col].filter(tile => tile !== undefined
                 && (tile.tileType === TileType.WATER ||
                     tile.tileType === TileType.BRIDGE));
@@ -92,7 +92,7 @@ class MapEvaluator {
     }
 
     static evaluateNonEmptyTilesFactor(map) {
-        let totalTilesCount = map.width * map.height;
+        let totalTilesCount = MAP_WIDTH * MAP_HEIGHT;
         let nonEmptyTilesCount = map.tiles.flat().reduce((count, value) => {
             return count + (value.tileType !== undefined);
         }, 0);
@@ -102,8 +102,8 @@ class MapEvaluator {
     static evaluateFloraSquares(map) {
         let floraSquaresCount = 0;
         let tile = undefined;
-        for (let x = 0; x < map.width - 1; x++) {
-            for (let y = 0; y < map.height - 1; y++) {
+        for (let x = 0; x < MAP_WIDTH - 1; x++) {
+            for (let y = 0; y < MAP_HEIGHT - 1; y++) {
                 tile = map.tiles[x][y];
                 if (tile === undefined || tile.isFloraType() === false) continue;
                 tile = map.tiles[x + 1][y];
@@ -120,7 +120,7 @@ class MapEvaluator {
     }
 
     static getTileDistanceFromHorizontalCentralAxis(map, tileCoords) {
-        let middleIndex = map.height / 2;
+        let middleIndex = MAP_HEIGHT / 2;
         if (middleIndex % 1 != 0) // Checking if is not integer
         {
             middleIndex = Math.ceil(middleIndex);

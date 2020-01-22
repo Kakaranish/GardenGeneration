@@ -2,10 +2,6 @@ const MAP_WIDTH = 30;
 const MAP_HEIGHT = 21;
 const TILE_SIZE = 16;
 
-// const canvas = document.getElementById('canvas');
-
-let canvasCounter = 0;
-
 function createCanvas() {
     var canvas = document.createElement('canvas');
     canvas.style.border = "1px solid";
@@ -14,7 +10,6 @@ function createCanvas() {
     var body = document.getElementById("canvas_container");
     body.appendChild(canvas);
 
-    canvasCounter++;
     return canvas;
 }
 

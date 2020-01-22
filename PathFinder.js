@@ -16,10 +16,10 @@ class PathFinder {
         let fictiousPathsMap = this.getFictiousPathsMapFrom(fictiousPaths);
 
         from_point.fScore = 0;
-        let cameFrom = get2dArray(this.map.width, this.map.height, undefined);
+        let cameFrom = get2dArray(MAP_WIDTH, MAP_HEIGHT, undefined);
         let openSet = [from_point];
-        let gScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
-        let fScore = PathFinder.getInitScoreArray(this.map.width, this.map.height);
+        let gScore = PathFinder.getInitScoreArray(MAP_WIDTH, MAP_HEIGHT);
+        let fScore = PathFinder.getInitScoreArray(MAP_WIDTH, MAP_HEIGHT);
         gScore[from_point.x - 1][from_point.y - 1].score = 0;
         fScore[from_point.x - 1][from_point.y - 1].score = this.heuristic(from_point, bridge);
 
@@ -124,7 +124,7 @@ class PathFinder {
             return null;
         }
 
-        let fictiousPathsMap = get2dArray(this.map.width, this.map.height, undefined);
+        let fictiousPathsMap = get2dArray(MAP_WIDTH, MAP_HEIGHT, undefined);
         let flattenFictiousPaths = fictiousPaths.flat();
         flattenFictiousPaths.forEach(fictiousPathTile => {
             fictiousPathsMap[fictiousPathTile.x - 1][fictiousPathTile.y - 1] =
@@ -137,8 +137,8 @@ class PathFinder {
         let neighbours = [];
         let tentative_neighbours = PathFinder.getTentativeNeighbours(point);
         tentative_neighbours.forEach(tentative_neighbour => {
-            if (tentative_neighbour.x < 1 || tentative_neighbour.x > this.map.width ||
-                tentative_neighbour.y < 1 || tentative_neighbour.y > this.map.height) {
+            if (tentative_neighbour.x < 1 || tentative_neighbour.x > MAP_WIDTH ||
+                tentative_neighbour.y < 1 || tentative_neighbour.y > MAP_HEIGHT) {
                 return;
             }
             if (this.map.tiles[tentative_neighbour.x - 1][tentative_neighbour.y - 1] === undefined) {
@@ -155,8 +155,8 @@ class PathFinder {
         let tentative_neighbours = PathFinder.getTentativeNeighbours(point);
 
         tentative_neighbours.forEach(tentative_neighbour => {
-            if (tentative_neighbour.x < 1 || tentative_neighbour.x > this.map.width ||
-                tentative_neighbour.y < 1 || tentative_neighbour.y > this.map.height) {
+            if (tentative_neighbour.x < 1 || tentative_neighbour.x > MAP_WIDTH ||
+                tentative_neighbour.y < 1 || tentative_neighbour.y > MAP_HEIGHT) {
                 return;
             }
             if (this.map.tiles[tentative_neighbour.x - 1][tentative_neighbour.y - 1] !== undefined) {

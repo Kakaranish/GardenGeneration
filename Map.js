@@ -1,10 +1,7 @@
 class Map {
-    constructor(width = MAP_WIDTH, height = MAP_HEIGHT) {
+    constructor() {
         this.canvas = null;
         this.context = null;
-
-        this.width = width;
-        this.height = height;
 
         this.tiles = null;
         this.initTiles();
@@ -16,14 +13,14 @@ class Map {
     }
 
     initTiles() {
-        this.tiles = new Array(this.width)
-        for (let i = 0; i < this.width; i++) {
-            this.tiles[i] = new Array(this.height);
+        this.tiles = new Array(MAP_WIDTH)
+        for (let i = 0; i < MAP_WIDTH; i++) {
+            this.tiles[i] = new Array(MAP_HEIGHT);
         }
     }
 
     getTileType(x, y) {
-        if (x < 1 || x > this.width || y < 1 || y > this.height) {
+        if (x < 1 || x > MAP_WIDTH || y < 1 || y > MAP_HEIGHT) {
             return null;
         }
         let tile = this.tiles[x - 1][y - 1];
@@ -31,8 +28,8 @@ class Map {
     }
 
     drawTiles() {
-        for (let i = 0; i < this.width; i++) {
-            for (let j = 0; j < this.height; j++) {
+        for (let i = 0; i < MAP_WIDTH; i++) {
+            for (let j = 0; j < MAP_HEIGHT; j++) {
                 let tile = this.tiles[i][j];
                 if (tile === undefined) {
                     continue;
@@ -77,8 +74,8 @@ class Map {
     }
 
     isPointLegal(point) {
-        return point.x >= 1 && point.x <= this.width
-            && point.y >= 1 && point.y <= this.height;
+        return point.x >= 1 && point.x <= MAP_WIDTH
+            && point.y >= 1 && point.y <= MAP_HEIGHT;
     }
 
     isBridgeLegal(x, y) {
@@ -102,7 +99,7 @@ class Map {
     // Validation if brook?
     countTilesAboveBrook() {
         let totalEmptyTilesCount = 0;
-        for (let col = 0; col < this.width; col++) {
+        for (let col = 0; col < MAP_WIDTH; col++) {
             let firstWaterTileIndex = this.tiles[col].findIndex(tile => {
                 return tile !== undefined && (tile.tileType === TileType.WATER
                     || tile.tileType === TileType.BRIDGE);
@@ -123,7 +120,7 @@ class Map {
 
     countTilesBelowBrook() {
         let totalEmptyTilesCount = 0;
-        for (let col = 0; col < this.width; col++) {
+        for (let col = 0; col < MAP_WIDTH; col++) {
             let firstWaterTileIndex = this.tiles[col].findIndex(tile => {
                 return tile !== undefined && (tile.tileType === TileType.WATER
                     || tile.tileType === TileType.BRIDGE);
@@ -147,7 +144,7 @@ class Map {
     }
 
     getEmptyTilesCount() {
-        let totalTilesCount = this.width * this.height;
+        let totalTilesCount = MAP_WIDTH * MAP_HEIGHT;
         let nonEmptyTilesCount = this.tiles.filter(tile => tile !== undefined).length;
         return totalTilesCount - nonEmptyTilesCount;
     }
@@ -155,8 +152,8 @@ class Map {
     setCanvas(canvas) {
         this.canvas = canvas;
         this.context = this.canvas.getContext('2d');
-        this.canvas.width = this.width * TILE_SIZE;
-        this.canvas.height = this.height * TILE_SIZE;
+        this.canvas.width = MAP_WIDTH * TILE_SIZE;
+        this.canvas.height = MAP_HEIGHT * TILE_SIZE;
         this.fillBackground();
     }
 

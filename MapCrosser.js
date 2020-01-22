@@ -150,7 +150,7 @@ class MapCrosser {
             floraTiles.splice(indexToRemove, 1);
         }
 
-        let centerIndex = Math.ceil(leftMap.width / 2.);
+        let centerIndex = Math.ceil(MAP_WIDTH / 2.);
         for (let i = 1; i <= toDistortCount; i++) {
             let tile = null;
             let randomTileCoords = null;
@@ -209,7 +209,7 @@ class MapCrosser {
     }
 
     static getFloraFromLeftHalfOfMap(map) {
-        let centerIndex = Math.ceil(map.width / 2.);
+        let centerIndex = Math.ceil(MAP_WIDTH / 2.);
         let floraTiles = map.tiles.flat().filter(tile =>
             tile !== undefined && tile.isFloraType() && tile.x <= centerIndex);
         return floraTiles.map(floraTile => {
@@ -222,7 +222,7 @@ class MapCrosser {
     }
 
     static getFloraFromRightHalfOfMap(map) {
-        let centerIndex = Math.ceil(map.width / 2.);
+        let centerIndex = Math.ceil(MAP_WIDTH / 2.);
         let floraTiles = map.tiles.flat().filter(tile =>
             tile !== undefined && tile.isFloraType() && tile.x > centerIndex);
         return floraTiles.map(floraTile => {
