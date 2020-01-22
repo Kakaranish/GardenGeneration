@@ -31,7 +31,6 @@ class MapEvaluator {
         console.log("Coverage along brook: " + coverageAlongBrook);
         console.log("Flora squares: " + floraSquares);
         console.log("Total score: " + totalFactor);
-
     }
 
     static evaluateCoverageAlongBrook(map) {

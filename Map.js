@@ -1,11 +1,10 @@
 class Map {
-    constructor(canvas, width = MAP_WIDTH, height = MAP_HEIGHT) {
-        this.canvas = canvas;
-        this.context = this.canvas.getContext('2d');
+    constructor(width = MAP_WIDTH, height = MAP_HEIGHT) {
+        this.canvas = null;
+        this.context = null;
+
         this.width = width;
         this.height = height;
-        this.canvas.width = this.width * TILE_SIZE;
-        this.canvas.height = this.height * TILE_SIZE;
 
         this.tiles = null;
         this.initTiles();
@@ -14,13 +13,6 @@ class Map {
 
         this.pathTiles = [];
         this.bridge = null;
-
-        this.fillBackground();
-    }
-
-    fillBackground() {
-        this.context.fillStyle = "#75CB75";
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     initTiles() {
@@ -52,7 +44,7 @@ class Map {
 
     drawGrid() {
         this.context.fillStyle = "#000000";
-        
+
         let x_times = Math.floor(this.canvas.width / TILE_SIZE);
         let y_times = Math.floor(this.canvas.height / TILE_SIZE);
         for (let i = 1; i <= x_times; i++) {
@@ -75,8 +67,13 @@ class Map {
     }
 
     draw() {
-        this.drawTiles();
-        this.drawGrid();
+        if (this.canvas !== null) {
+            this.drawTiles();
+            this.drawGrid();
+        }
+        else {
+            console.log("No canvas. Unable to draw map");
+        }
     }
 
     isPointLegal(point) {
@@ -149,9 +146,22 @@ class Map {
         return totalEmptyTilesCount;
     }
 
-    getEmptyTilesCount(){
+    getEmptyTilesCount() {
         let totalTilesCount = this.width * this.height;
         let nonEmptyTilesCount = this.tiles.filter(tile => tile !== undefined).length;
         return totalTilesCount - nonEmptyTilesCount;
+    }
+
+    setCanvas(canvas) {
+        this.canvas = canvas;
+        this.context = this.canvas.getContext('2d');
+        this.canvas.width = this.width * TILE_SIZE;
+        this.canvas.height = this.height * TILE_SIZE;
+        this.fillBackground();
+    }
+
+    fillBackground() {
+        this.context.fillStyle = "#75CB75";
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }

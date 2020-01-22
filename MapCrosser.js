@@ -1,5 +1,5 @@
 class MapCrosser {
-    static crossMaps(map1, map2, canvasForCrossProduct) {
+    static crossMaps(map1, map2) {
         let firstIsLeft = randomTrueOrFalse();
         let leftMap = firstIsLeft
             ? map1
@@ -8,7 +8,7 @@ class MapCrosser {
             ? map2
             : map1;
 
-        let crossResult = new Map(canvasForCrossProduct, MAP_WIDTH, MAP_HEIGHT);
+        let crossResult = new Map();
 
         let brook = MapCrosser.crossBrooks(leftMap.waterTiles, rightMap.waterTiles, MAP_WIDTH);
         MapGenerator.addGeneratedBrookToMap(crossResult, brook);

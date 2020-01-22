@@ -19,15 +19,18 @@ function createCanvas() {
 }
 
 let canvas1 = createCanvas();
-let map1 = MapGenerator.generate(canvas1);
+let map1 = MapGenerator.generate();
+map1.setCanvas(canvas1);
 map1.draw();
 
 let canvas2 = createCanvas();
-let map2 = MapGenerator.generate(canvas2);
+let map2 = MapGenerator.generate();
+map2.setCanvas(canvas2);
 map2.draw();
 
 let crossResultCanvas = createCanvas();
-let crossResult = MapCrosser.crossMaps(map1, map2, crossResultCanvas);
+let crossResult = MapCrosser.crossMaps(map1, map2);
+crossResult.setCanvas(crossResultCanvas);
 crossResult.draw();
 
 // MapEvaluator.evaluateMapScore(map)

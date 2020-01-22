@@ -3,8 +3,8 @@ const MIN_DISTANCE_FROM_EDGE = 3;
 const MIN_VERTICAL_MOVEMENT = 3;
 
 class MapGenerator {
-    static generate(canvas) {
-        let map = new Map(canvas, MAP_WIDTH, MAP_HEIGHT);
+    static generate() {
+        let map = new Map();
         
         let brook = MapGenerator.generateBrook(map);
         MapGenerator.addGeneratedBrookToMap(map, brook);
