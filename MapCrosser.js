@@ -16,27 +16,21 @@ class MapCrosser {
         });
 
         let bridge = MapGenerator.generateBridge(crossResult);  // Always at center of the map
-        MapGenerator.addGeneratedBridgeToMap(crossResult, bridge);
+        MapUtilities.addGeneratedBridgeToMap(crossResult, bridge);
 
         let paths = MapGenerator.generatePaths(crossResult);
-        MapGenerator.addGeneratedPathsToMap(crossResult, paths);
+        MapUtilities.addGeneratedPathsToMap(crossResult, paths);
 
         let flora = MapCrosser.crossFlora(leftMap, rightMap);
-        MapGenerator.addGeneratedFloraToMap(crossResult, flora);
+        MapUtilities.addGeneratedFloraToMap(crossResult, flora);
 
         return crossResult;
     }
 
     static crossBrooks(leftBrook, rightBrook) {
-        let lastTile = null;
-        let tileIndex = null;
-        let mapCenter = {
-            "x": Math.round(MAP_WIDTH / 2),
-            "y": Math.round(MAP_HEIGHT / 2)
-        };
-
         let randomFactor = randomInt(1, 10);
-        if (randomFactor === 5) { // Any number
+        let shouldOccurMutation = randomFactor === 5; // Any number
+        if (shouldOccurMutation) { 
             let leftIsChoosen = randomTrueOrFalse();
             if (leftIsChoosen) {
                 leftBrook = MapGenerator.generateBrook();
@@ -45,33 +39,13 @@ class MapCrosser {
                 rightBrook = MapGenerator.generateBrook();
             }
         }
-        
-        let leftBrookHalf = MapCrosser.getBrookFromLeftHalfOfMap(leftBrook);
-        tileIndex = 0;
-        leftBrookHalf.reverse();
-        while (leftBrookHalf[tileIndex].x >= mapCenter.x - 3) {
-            tileIndex++;
-        }
-        leftBrookHalf = leftBrookHalf.slice(tileIndex);
-        leftBrookHalf.reverse();
 
-        let rightBrookHalf = MapCrosser.getBrookFromRightHalfOfMap(rightBrook);
-        tileIndex = 1;
-        lastTile = rightBrookHalf[tileIndex - 1];
-        while (rightBrookHalf[tileIndex].x <= mapCenter.x + 3) {
-            tileIndex++;
-        }
-
-        lastTile = rightBrookHalf[tileIndex - 1];
-        while (rightBrookHalf[tileIndex].x === lastTile.x) {
-            tileIndex++;
-        }
-        tileIndex--;
-        rightBrookHalf = rightBrookHalf.slice(tileIndex);
-
-        let resultBrook = [].concat(leftBrookHalf);
-        let leftBrookEndPoint = leftBrookHalf[leftBrookHalf.length - 1];
-        let rightBrookEndPoint = rightBrookHalf[0];``
+        let trimmedLeftBrookHalf = MapCrosser.getTrimmedBrookFromLeftHalfOfMap(leftBrook);
+        let trimmedRightBrookHalf = MapCrosser.getTrimmedBrookFromRightHalfOfMap(rightBrook);
+ 
+        let resultBrook = [].concat(trimmedLeftBrookHalf);
+        let leftBrookEndPoint = trimmedLeftBrookHalf[trimmedLeftBrookHalf.length - 1];
+        let rightBrookEndPoint = trimmedRightBrookHalf[0];
         for (let x = leftBrookEndPoint.x + 1; x <= rightBrookEndPoint.x; x++) {
             resultBrook.push({
                 "x": x,
@@ -98,12 +72,12 @@ class MapCrosser {
         }
 
         resultBrookEndPoint = resultBrook[resultBrook.length - 1];
-        rightBrookEndPoint = rightBrookHalf[0];
+        rightBrookEndPoint = trimmedRightBrookHalf[0];
         if (resultBrookEndPoint.x === rightBrookEndPoint.x &&
             resultBrookEndPoint.y === rightBrookEndPoint.y) {
-            rightBrookHalf = rightBrookHalf.slice(1);
+            trimmedRightBrookHalf = trimmedRightBrookHalf.slice(1);
         }
-        resultBrook = resultBrook.concat(rightBrookHalf);
+        resultBrook = resultBrook.concat(trimmedRightBrookHalf);
         return resultBrook.map(waterTile => {
             return {
                 "x": waterTile.x,
@@ -117,6 +91,49 @@ class MapCrosser {
         let rightFlora = MapCrosser.getDistortedFloraFromRightPartOfMap(rightMap);
         return leftFlora.concat(rightFlora);
     }
+
+    static getTrimmedBrookFromLeftHalfOfMap(brook)
+    {
+        let mapCenter = {
+            "x": Math.round(MAP_WIDTH / 2),
+            "y": Math.round(MAP_HEIGHT / 2)
+        };
+        let leftBrookHalf = this.getBrookFromLeftHalfOfMap(brook);
+        leftBrookHalf.reverse();
+        
+        let tileIndex = 0;
+        while (leftBrookHalf[tileIndex].x >= mapCenter.x - 3) {
+            tileIndex++;
+        }
+
+        leftBrookHalf = leftBrookHalf.slice(tileIndex);
+        leftBrookHalf.reverse();
+        return leftBrookHalf;
+    }
+
+    static getTrimmedBrookFromRightHalfOfMap(brook)
+    {
+        let mapCenter = {
+            "x": Math.round(MAP_WIDTH / 2),
+            "y": Math.round(MAP_HEIGHT / 2)
+        };
+        let rightBrookHalf = MapCrosser.getBrookFromRightHalfOfMap(brook);
+        let tileIndex = 0;
+        
+        while (rightBrookHalf[tileIndex].x <= mapCenter.x + 3) {
+            tileIndex++;
+        }
+
+        let lastTile = rightBrookHalf[tileIndex - 1];
+        while (rightBrookHalf[tileIndex].x === lastTile.x) {
+            tileIndex++;
+        }
+
+        tileIndex--;
+        rightBrookHalf = rightBrookHalf.slice(tileIndex);
+        return rightBrookHalf;
+    }
+
 
     static getBrookFromLeftHalfOfMap(brook) {
         let centerIndex = Math.round(MAP_WIDTH / 2);
