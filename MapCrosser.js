@@ -11,102 +11,120 @@ class MapCrosser {
         let crossResult = new Map();
 
         let brook = MapCrosser.crossBrooks(leftMap.waterTiles, rightMap.waterTiles, MAP_WIDTH);
-        MapGenerator.addGeneratedBrookToMap(crossResult, brook);
+        // MapGenerator.addGeneratedBrookToMap(crossResult, brook);
+        brook.forEach(waterTile => {
+            new WaterTile(crossResult, null, waterTile.x, waterTile.y);
+        });
+        new PathTile(crossResult, null, 16, 1);
+        // let bridge = MapGenerator.generateBridge(crossResult);  // Always at center of the map
+        // MapGenerator.addGeneratedBridgeToMap(crossResult, bridge);
 
-        let bridge = MapGenerator.generateBridge(crossResult);  // Always at center of the map
-        MapGenerator.addGeneratedBridgeToMap(crossResult, bridge);
+        // try {
+        //     let paths = MapGenerator.generatePaths(crossResult);
+        //     MapGenerator.addGeneratedPathsToMap(crossResult, paths);
+        // } catch (error) {
+        //     alert("ERROR");
+        // }
 
-        let paths = MapGenerator.generatePaths(crossResult);
-        MapGenerator.addGeneratedPathsToMap(crossResult, paths);
-
-        let flora = MapCrosser.crossFlora(leftMap, rightMap);
-        MapGenerator.addGeneratedFloraToMap(crossResult, flora);
+        // let flora = MapCrosser.crossFlora(leftMap, rightMap);
+        // MapGenerator.addGeneratedFloraToMap(crossResult, flora);
 
         return crossResult;
     }
 
-    static crossBrooks(leftBrook, rightBrook, mapWidth = MAP_WIDTH) {
+    static crossBrooks(leftBrook, rightBrook) {
         let last5WaterTiles = null;
         let lastTile = null;
+        let mapCenter = {
+            "x": Math.round(MAP_WIDTH / 2),
+            "y": Math.round(MAP_HEIGHT / 2)
+        };
 
-        let leftBrookHalf = MapCrosser.getBrookFromLeftHalfOfMap(
-            leftBrook, mapWidth);
+        let randomFactor = randomInt(1, 10);
+        if (randomFactor === 5) { // Any number
+            let leftIsChoosen = randomTrueOrFalse();
+            if (leftIsChoosen) {
+                leftBrook = MapGenerator.generateBrook();
+            }
+            else {
+                rightBrook = MapGenerator.generateBrook();
+            }
+
+        }
+        let leftBrookHalf = MapCrosser.getBrookFromLeftHalfOfMap(leftBrook);
         last5WaterTiles = leftBrookHalf.slice(-5);
         lastTile = leftBrookHalf.slice(-1)[0];
 
         if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
-            let reversedLeftBrookHalf = [].concat(leftBrookHalf).reverse();
+            leftBrookHalf.reverse();
 
             let tileIndex = 0;
-            while (reversedLeftBrookHalf[tileIndex].y === lastTile.y) {
+            while (leftBrookHalf[tileIndex].y === lastTile.y) {
                 tileIndex++;
             }
-            lastTile = reversedLeftBrookHalf[tileIndex - 1];
-            while (reversedLeftBrookHalf[tileIndex].x === lastTile.x) {
+            lastTile = leftBrookHalf[tileIndex - 1];
+            while (leftBrookHalf[tileIndex].x >= mapCenter.x - 2) {
                 tileIndex++;
             }
 
-            reversedLeftBrookHalf = reversedLeftBrookHalf.slice(tileIndex);
-            leftBrookHalf = [].concat(reversedLeftBrookHalf).reverse();
+            leftBrookHalf.slice(tileIndex);
+            console.log(tileIndex);
+            leftBrookHalf.reverse();
         }
 
-        let rightBrookHalf = MapCrosser.getBrookFromRightHalfOfMap(
-            rightBrook, mapWidth);
-        rightBrookHalf.reverse();
+        let rightBrookHalf = MapCrosser.getBrookFromRightHalfOfMap(rightBrook);
         last5WaterTiles = rightBrookHalf.slice(-5);
-        lastTile = rightBrookHalf.slice(-1)[0];
+        lastTile = rightBrookHalf[0];
 
         if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
-            var reversedRightBrookHalf = [].concat(rightBrookHalf).reverse();
-
             let tileIndex = 0;
-            while (reversedRightBrookHalf[tileIndex].y === lastTile.y) {
+            while (rightBrookHalf[tileIndex].y === lastTile.y) {
                 tileIndex++;
             }
-            lastTile = reversedRightBrookHalf[tileIndex - 1];
-            while (reversedRightBrookHalf[tileIndex].x === lastTile.x) {
+            lastTile = rightBrookHalf[tileIndex - 1];
+            while (rightBrookHalf[tileIndex].x <= mapCenter.x + 5) {
                 tileIndex++;
             }
 
-            reversedRightBrookHalf = reversedRightBrookHalf.slice(tileIndex);
-            rightBrookHalf = [].concat(reversedRightBrookHalf).reverse();
+            lastTile = rightBrookHalf[tileIndex - 1];
+            while (rightBrookHalf[tileIndex].x === lastTile.x) {
+                tileIndex++;
+            }
+            tileIndex--;
+
+            rightBrookHalf = rightBrookHalf.slice(tileIndex);
         }
+
 
         let resultBrook = [].concat(leftBrookHalf);
+        let leftBrookEndPoint = leftBrookHalf[leftBrookHalf.length - 1];
+        let rightBrookEndPoint = rightBrookHalf[0];
 
-        let leftBrookEndPoint = resultBrook.slice(-1)[0];
-        let rightBrookEndPoint = rightBrookHalf.slice(-1)[0];
-        for (let x = leftBrookEndPoint.x + 1; x <= rightBrookEndPoint.x; x++) {
-            resultBrook.push({
-                "x": x,
-                "y": leftBrookEndPoint.y
-            });
-        }
+        // for (let x = leftBrookEndPoint.x + 1; x <= rightBrookEndPoint.x; x++) {
+        //     resultBrook.push({
+        //         "x": x,
+        //         "y": leftBrookEndPoint.y
+        //     });
+        // }
 
-        leftBrookEndPoint = resultBrook.slice(-1)[0];
-        if (leftBrookEndPoint.y < rightBrookEndPoint.y) {
-            for (let y = leftBrookEndPoint.y + 1; y < rightBrookEndPoint.y; y++) {
-                resultBrook.push({
-                    "x": leftBrookEndPoint.x,
-                    "y": y
-                });
-            }
-        }
-        else if (leftBrookEndPoint.y > rightBrookEndPoint.y) {
-            for (let y = leftBrookEndPoint.y - 1; y > rightBrookEndPoint.y; y--) {
-                resultBrook.push({
-                    "x": leftBrookEndPoint.x,
-                    "y": y
-                });
-            }
-        }
 
-        leftBrookEndPoint = resultBrook.slice(-1)[0];
-        rightBrookHalf.reverse();
-
-        if (leftBrookEndPoint.y === rightBrookEndPoint.y) {
-            resultBrook.pop()
-        }
+        // let resultBrookEndPoint = resultBrook[resultBrook.length - 1];
+        // if (resultBrookEndPoint.y < rightBrookEndPoint.y) {
+        //     for (let y = resultBrookEndPoint.y + 1; y < rightBrookEndPoint.y; y++) {
+        //         resultBrook.push({
+        //             "x": resultBrookEndPoint.x,
+        //             "y": y
+        //         });
+        //     }
+        // }
+        // else if (resultBrookEndPoint.y > rightBrookEndPoint.y) {
+        //     for (let y = resultBrookEndPoint.y - 1; y > rightBrookEndPoint.y; y--) {
+        //         resultBrook.push({
+        //             "x": resultBrookEndPoint.x,
+        //             "y": y
+        //         });
+        //     }
+        // }
 
         resultBrook = resultBrook.concat(rightBrookHalf);
         return resultBrook.map(waterTile => {
@@ -123,14 +141,14 @@ class MapCrosser {
         return leftFlora.concat(rightFlora);
     }
 
-    static getBrookFromLeftHalfOfMap(brook, mapWidth) {
-        let centerIndex = Math.ceil(mapWidth / 2.);
+    static getBrookFromLeftHalfOfMap(brook) {
+        let centerIndex = Math.round(MAP_WIDTH / 2);
         return brook.filter(waterTile => waterTile.x < centerIndex)
     }
 
-    static getBrookFromRightHalfOfMap(brook, mapWidth) {
-        let centerIndex = Math.ceil(mapWidth / 2.);
-        return brook.filter(waterTile => waterTile.x > centerIndex)
+    static getBrookFromRightHalfOfMap(brook) {
+        let centerIndex = Math.round(MAP_WIDTH / 2);
+        return brook.filter(waterTile => waterTile.x > centerIndex);
     }
 
     static getDistortedFloraFromLeftPartOfMap(leftMap) {
@@ -143,7 +161,7 @@ class MapCrosser {
                 "floraType": floraTile.tileType
             }
         });
-        
+
         let toDistortCount = Math.ceil(floraTiles.length / percentageToDistort);
         for (let i = 1; i <= toDistortCount; i++) {
             let indexToRemove = randomInt(0, floraTiles.length - 1);
@@ -188,7 +206,7 @@ class MapCrosser {
         }
 
         let centerIndex = Math.ceil(MAP_WIDTH / 2.);
-        for (let i = 1; i <= toDistortCount; i++) {
+        for (let i = 1; i <= toDistortCount + 2; i++) {
             let tile = null;
             let randomTileCoords = null;
             while (tile !== undefined) {

@@ -21,18 +21,16 @@ class MapGenerator {
         return map;
     }
 
-    static generateBrook(emptyMap) {
-        let map = emptyMap;
+    static generateBrook() {
         let startY = randomInt(1 + MIN_DISTANCE_FROM_EDGE,
             MAP_HEIGHT - MIN_DISTANCE_FROM_EDGE);
-
         let currentPosition = {
             "x": 1,
             "y": startY
         };
         let waterTiles = [currentPosition];
 
-        let horizontalMovements = MapGenerator.randomHorizontalMovementsLenghts(map);
+        let horizontalMovements = MapGenerator.randomHorizontalMovementsLenghts();
         horizontalMovements.forEach((horizontalMovementLength, horizontalMovementNum) => {
             for (let j = (horizontalMovementNum == 0) ? 2 : 1; j <= horizontalMovementLength; j++) {
                 currentPosition = {
@@ -46,8 +44,7 @@ class MapGenerator {
                 return;
             }
 
-            let verticalMovementLength = MapGenerator.randomVerticalMovementLength(
-                map, currentPosition);
+            let verticalMovementLength = MapGenerator.randomVerticalMovementLength(currentPosition);
             let isMovementUp = verticalMovementLength < 0 ? true : false;
             for (let j = 0; j < Math.abs(verticalMovementLength); j++) {
                 currentPosition = {
@@ -155,21 +152,23 @@ class MapGenerator {
 
     static addGeneratedPathsToMap(map, paths) {
         paths.forEach(path => {
-            let currentPathTile = new PathTile(map, null, path[0].x, path[0].y);
+            path.forEach(pathTile => {
+                new PathTile(map, null, pathTile.x, pathTile.y);
+            });
 
-            for (let i = 1; i < path.length; i++) {
-                let nextTileCoords = path[i];
-                let nextTileDirection = currentPathTile.getNeighbourDirection(nextTileCoords);
-                let nextPathTileTileType = map.getTileType(nextTileCoords.x, nextTileCoords.y);
-                if (nextPathTileTileType === TileType.PATH ||
-                    nextPathTileTileType === TileType.BRIDGE) {
-                    let nextTile = map.tiles[nextTileCoords.x - 1][nextTileCoords.y - 1];
-                    currentPathTile.childs.push(nextTile);
-                    break;
-                }
+            // // for (let i = 1; i < path.length; i++) {
+            // //     let nextTileCoords = path[i];
+            // //     let nextTileDirection = currentPathTile.getNeighbourDirection(nextTileCoords);
+            // //     let nextPathTileTileType = map.getTileType(nextTileCoords.x, nextTileCoords.y);
+            // //     if (nextPathTileTileType === TileType.PATH ||
+            // //         nextPathTileTileType === TileType.BRIDGE) {
+            // //         let nextTile = map.tiles[nextTileCoords.x - 1][nextTileCoords.y - 1];
+            // //         currentPathTile.childs.push(nextTile);
+            // //         break;
+            // //     }
 
-                currentPathTile = currentPathTile.addChild(TileType.PATH, nextTileDirection);
-            }
+            // //     currentPathTile = currentPathTile.addChild(TileType.PATH, nextTileDirection);
+            // }
         });
     }
 
@@ -182,8 +181,7 @@ class MapGenerator {
         })
     }
 
-    static randomHorizontalMovementsLenghts(emptyMap) {
-        let map = emptyMap;
+    static randomHorizontalMovementsLenghts() {
         let breaksCount = randomInt(4, 7);
         let maxHorizontalMovementLength = Math.floor(MAP_WIDTH / breaksCount) + 2;
         let remainingMovementPoints = MAP_WIDTH;
@@ -208,8 +206,7 @@ class MapGenerator {
         return horizontalMovements;
     }
 
-    static randomVerticalMovementLength(emptyMap, currentPosition) {
-        let map = emptyMap;
+    static randomVerticalMovementLength(currentPosition) {
         let maxVerticalMovementLength = 0;
         let isMovementUp = randomTrueOrFalse();
         if (isMovementUp) {
@@ -251,13 +248,14 @@ class MapGenerator {
             });
         });
 
+        const filterSize = 2;
         if (filterAroundBridge) {
             let bridge = {
                 "x": map.bridge.x,
                 "y": map.bridge.y
             };
             return surroundingTiles.filter(obstacle =>
-                (obstacle.x < bridge.x - 2) || (obstacle.x > bridge.x + 2) || (obstacle.y < bridge.y - 2) || (obstacle.y > bridge.y + 2)
+                (obstacle.x < bridge.x - filterSize) || (obstacle.x > bridge.x + filterSize) || (obstacle.y < bridge.y - 2) || (obstacle.y > bridge.y + filterSize)
             );
         }
         return surroundingTiles;

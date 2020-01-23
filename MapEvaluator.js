@@ -25,12 +25,8 @@ class MapEvaluator {
         let floraSquares = MapEvaluator.evaluateFloraSquares(map);
         let floraFactor = floraSquaresPriority * (floraSquares / maxFloraSquaresValue);
 
-        let totalFactor = distanceFactor + floraFactor +  coverageAlongBrookFactor;
-
-        console.log("Total distance from horizontal center: " + totalDistanceFromHorizontalCenter);
-        console.log("Coverage along brook: " + coverageAlongBrook);
-        console.log("Flora squares: " + floraSquares);
-        console.log("Total score: " + totalFactor);
+        let totalScore = distanceFactor + floraFactor +  coverageAlongBrookFactor;
+        return totalScore;
     }
 
     static evaluateCoverageAlongBrook(map) {

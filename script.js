@@ -1,31 +1,78 @@
-const MAP_WIDTH = 30;
+const MAP_WIDTH = 31;
 const MAP_HEIGHT = 21;
 const TILE_SIZE = 16;
 
-function createCanvas() {
-    var canvas = document.createElement('canvas');
-    canvas.style.border = "1px solid";
-    canvas.width = 0;
-    canvas.height = 0;
-    var body = document.getElementById("canvas_container");
-    body.appendChild(canvas);
+let firstGenerationWasGenerated = false;
+let currentGeneration = null;
 
-    return canvas;
+function generateButtonOnClick() {
+    if (currentGeneration === null) {
+        document.getElementById("generate_button").innerHTML = "Generate Next Generation";
+
+        var generateNext5GenerationsButton = document.createElement("button");
+        generateNext5GenerationsButton.id = "generate_next_5_generations";
+        generateNext5GenerationsButton.innerHTML = "Generate 5 Next Generations";
+        generateNext5GenerationsButton.onclick = function () {
+            for (let i = 0; i < 5; i++) {
+                currentGeneration = MapEvolutionist.generateNextGeneration(currentGeneration);
+            }
+            clearCanvasContainer();
+            currentGeneration.forEach(entity => {
+                let canvas = createCanvas();
+                entity.setCanvas(canvas);
+                entity.draw();
+            });
+        };
+        document.getElementById("generate_buttons").appendChild(generateNext5GenerationsButton);
+
+        var generateNext20GenerationsButton = document.createElement("button");
+        generateNext20GenerationsButton.id = "generate_next_20_generations";
+        generateNext20GenerationsButton.innerHTML = "Generate 20 Next Generations";
+        generateNext20GenerationsButton.onclick = function () {
+            for (let i = 0; i < 20; i++) {
+                currentGeneration = MapEvolutionist.generateNextGeneration(currentGeneration);
+            }
+            clearCanvasContainer();
+            currentGeneration.forEach(entity => {
+                let canvas = createCanvas();
+                entity.setCanvas(canvas);
+                entity.draw();
+            });
+        };
+        document.getElementById("generate_buttons").appendChild(generateNext20GenerationsButton);
+
+        var generateNext100GenerationsButton = document.createElement("button");
+        generateNext100GenerationsButton.id = "generate_next_100_generations";
+        generateNext100GenerationsButton.innerHTML = "Generate 100 Next Generations";
+        generateNext100GenerationsButton.onclick = function () {
+            for (let i = 0; i < 100; i++) {
+                currentGeneration = MapEvolutionist.generateNextGeneration(currentGeneration);
+            }
+            clearCanvasContainer();
+            currentGeneration.forEach(entity => {
+                let canvas = createCanvas();
+                entity.setCanvas(canvas);
+                entity.draw();
+            });
+        };
+        document.getElementById("generate_buttons").appendChild(generateNext100GenerationsButton);
+
+        currentGeneration = MapEvolutionist.generateFirstGeneration(10);
+        currentGeneration.forEach(entity => {
+            let canvas = createCanvas();
+            entity.setCanvas(canvas);
+            entity.draw();
+        });
+    }
+    else {
+        currentGeneration = MapEvolutionist.generateNextGeneration(currentGeneration);
+        clearCanvasContainer();
+        currentGeneration.forEach(entity => {
+            let canvas = createCanvas();
+            entity.setCanvas(canvas);
+            entity.draw();
+        });
+    }
 }
+document.getElementById("generate_button").onclick = generateButtonOnClick;
 
-let canvas1 = createCanvas();
-let map1 = MapGenerator.generate();
-map1.setCanvas(canvas1);
-map1.draw();
-
-let canvas2 = createCanvas();
-let map2 = MapGenerator.generate();
-map2.setCanvas(canvas2);
-map2.draw();
-
-let crossResultCanvas = createCanvas();
-let crossResult = MapCrosser.crossMaps(map1, map2);
-crossResult.setCanvas(crossResultCanvas);
-crossResult.draw();
-
-// MapEvaluator.evaluateMapScore(map)

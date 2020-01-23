@@ -64,3 +64,19 @@ function randomFloraType(randomSet = undefined) {
     let randomIndex = randomInt(0, randomSet.length - 1);
     return randomSet[randomIndex];
 }
+
+function clearCanvasContainer()
+{
+    document.getElementById("canvas_container").innerHTML = "";
+}
+
+function createCanvas() {
+    var canvas = document.createElement('canvas');
+    canvas.style.border = "1px solid";
+    canvas.width = 0;
+    canvas.height = 0;
+    var body = document.getElementById("canvas_container");
+    body.appendChild(canvas);
+
+    return canvas;
+}
