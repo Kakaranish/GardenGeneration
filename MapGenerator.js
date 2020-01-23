@@ -142,7 +142,8 @@ class MapGenerator {
         let currentWaterTile = new WaterTile(map, null, brook[0].x, brook[0].y);
         for (let i = 1; i < brook.length; i++) {
             let nextWaterTileDirection = currentWaterTile.getNeighbourDirection(brook[i]);
-            currentWaterTile = currentWaterTile.addNextWaterTile(nextWaterTileDirection);
+            let nextTile = currentWaterTile.addNextWaterTile(nextWaterTileDirection);
+            currentWaterTile = nextTile !== null ? nextTile : currentWaterTile;
         }
     }
 
@@ -152,23 +153,21 @@ class MapGenerator {
 
     static addGeneratedPathsToMap(map, paths) {
         paths.forEach(path => {
-            path.forEach(pathTile => {
-                new PathTile(map, null, pathTile.x, pathTile.y);
-            });
+            let currentPathTile = new PathTile(map, null, path[0].x, path[0].y);
 
-            // // for (let i = 1; i < path.length; i++) {
-            // //     let nextTileCoords = path[i];
-            // //     let nextTileDirection = currentPathTile.getNeighbourDirection(nextTileCoords);
-            // //     let nextPathTileTileType = map.getTileType(nextTileCoords.x, nextTileCoords.y);
-            // //     if (nextPathTileTileType === TileType.PATH ||
-            // //         nextPathTileTileType === TileType.BRIDGE) {
-            // //         let nextTile = map.tiles[nextTileCoords.x - 1][nextTileCoords.y - 1];
-            // //         currentPathTile.childs.push(nextTile);
-            // //         break;
-            // //     }
+            for (let i = 1; i < path.length; i++) {
+                let nextTileCoords = path[i];
+                let nextTileDirection = currentPathTile.getNeighbourDirection(nextTileCoords);
+                let nextPathTileTileType = map.getTileType(nextTileCoords.x, nextTileCoords.y);
+                if (nextPathTileTileType === TileType.PATH ||
+                    nextPathTileTileType === TileType.BRIDGE) {
+                    let nextTile = map.tiles[nextTileCoords.x - 1][nextTileCoords.y - 1];
+                    currentPathTile.childs.push(nextTile);
+                    break;
+                }
 
-            // //     currentPathTile = currentPathTile.addChild(TileType.PATH, nextTileDirection);
-            // }
+                currentPathTile = currentPathTile.addChild(TileType.PATH, nextTileDirection);
+            }
         });
     }
 

@@ -7,13 +7,11 @@ class WaterTile extends Tile {
 
     addNextWaterTile(direction) {
         if (this.childs.some(child => child.direction === direction)) {
-            console.log("Two childs can't have same direction");
             return null;
         }
 
         let childCoords = this.getChildCoords(direction);
         if (this.map.tiles[childCoords.x - 1][childCoords.y - 1] !== undefined) {
-            console.log("Tile on " + childCoords.x + "," + childCoords.y + " already exists.");
             return null;
         }
 
@@ -52,7 +50,6 @@ class WaterTile extends Tile {
         }
 
         if (isLegal == false) {
-            console.log("Illegal water path.");
             return null;
         }
 

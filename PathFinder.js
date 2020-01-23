@@ -126,7 +126,6 @@ class PathFinder {
 
         let fictiousPathsMap = get2dArray(MAP_WIDTH, MAP_HEIGHT, undefined);
         let flattenFictiousPaths = fictiousPaths.flat();
-        console.log(fictiousPaths);
         flattenFictiousPaths.forEach(fictiousPathTile => {
             fictiousPathsMap[fictiousPathTile.x - 1][fictiousPathTile.y - 1] =
                 fictiousPathTile;

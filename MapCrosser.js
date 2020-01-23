@@ -11,21 +11,26 @@ class MapCrosser {
         let crossResult = new Map();
 
         let brook = MapCrosser.crossBrooks(leftMap.waterTiles, rightMap.waterTiles, MAP_WIDTH);
-        // MapGenerator.addGeneratedBrookToMap(crossResult, brook);
-        brook.forEach(waterTile => {
-            new WaterTile(crossResult, null, waterTile.x, waterTile.y);
-        });
-        new PathTile(crossResult, null, 16, 1);
-        // let bridge = MapGenerator.generateBridge(crossResult);  // Always at center of the map
-        // MapGenerator.addGeneratedBridgeToMap(crossResult, bridge);
+        try {
+            // MapGenerator.addGeneratedBrookToMap(crossResult, brook);
+            brook.forEach(waterTile => {
+                new WaterTile(crossResult, null, waterTile.x, waterTile.y);
+            });
+            // new PathTile(crossResult, null, 16, 1);
+            let bridge = MapGenerator.generateBridge(crossResult);  // Always at center of the map
+            MapGenerator.addGeneratedBridgeToMap(crossResult, bridge);
 
-        // try {
-        //     let paths = MapGenerator.generatePaths(crossResult);
-        //     MapGenerator.addGeneratedPathsToMap(crossResult, paths);
-        // } catch (error) {
-        //     alert("ERROR");
-        // }
-
+            let paths = MapGenerator.generatePaths(crossResult);
+            MapGenerator.addGeneratedPathsToMap(crossResult, paths);
+        } catch (error) {
+            alert("ERROR");
+            console.log("left");
+            console.log(leftMap);
+            console.log("right");
+            console.log(rightMap);
+            console.log(brook);
+            throw new Error("Something went badly wrong!");
+        }
         // let flora = MapCrosser.crossFlora(leftMap, rightMap);
         // MapGenerator.addGeneratedFloraToMap(crossResult, flora);
 
@@ -55,77 +60,82 @@ class MapCrosser {
         last5WaterTiles = leftBrookHalf.slice(-5);
         lastTile = leftBrookHalf.slice(-1)[0];
 
-        if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
-            leftBrookHalf.reverse();
-
-            let tileIndex = 0;
-            while (leftBrookHalf[tileIndex].y === lastTile.y) {
-                tileIndex++;
-            }
-            lastTile = leftBrookHalf[tileIndex - 1];
-            while (leftBrookHalf[tileIndex].x >= mapCenter.x - 2) {
-                tileIndex++;
-            }
-
-            leftBrookHalf.slice(tileIndex);
-            console.log(tileIndex);
-            leftBrookHalf.reverse();
+        leftBrookHalf.reverse();
+        let tileIndex = 0;
+        while (leftBrookHalf[tileIndex].x >= mapCenter.x - 3) {
+            tileIndex++;
         }
+        leftBrookHalf = leftBrookHalf.slice(tileIndex);
+        leftBrookHalf.reverse();
+        // if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
+
+
+        //     while (leftBrookHalf[tileIndex].y === lastTile.y) {
+        //         tileIndex++;
+        //     }
+
+
+        // }
 
         let rightBrookHalf = MapCrosser.getBrookFromRightHalfOfMap(rightBrook);
         last5WaterTiles = rightBrookHalf.slice(-5);
+        tileIndex = 1;
         lastTile = rightBrookHalf[0];
 
-        if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
-            let tileIndex = 0;
-            while (rightBrookHalf[tileIndex].y === lastTile.y) {
-                tileIndex++;
-            }
-            lastTile = rightBrookHalf[tileIndex - 1];
-            while (rightBrookHalf[tileIndex].x <= mapCenter.x + 5) {
-                tileIndex++;
-            }
-
-            lastTile = rightBrookHalf[tileIndex - 1];
-            while (rightBrookHalf[tileIndex].x === lastTile.x) {
-                tileIndex++;
-            }
-            tileIndex--;
-
-            rightBrookHalf = rightBrookHalf.slice(tileIndex);
+        lastTile = rightBrookHalf[tileIndex - 1];
+        while (rightBrookHalf[tileIndex].x <= mapCenter.x + 3) {
+            tileIndex++;
         }
 
+        lastTile = rightBrookHalf[tileIndex - 1];
+        while (rightBrookHalf[tileIndex].x === lastTile.x) {
+            tileIndex++;
+        }
+        tileIndex--;
+        rightBrookHalf = rightBrookHalf.slice(tileIndex);
+
+        // if (last5WaterTiles.every(tile => tile.y === lastTile.y) === false) {
+        //     let tileIndex = 1;
+        //     while (rightBrookHalf[tileIndex].y === lastTile.y) {
+        //         tileIndex++;
+        //     }
+
+        // }
 
         let resultBrook = [].concat(leftBrookHalf);
         let leftBrookEndPoint = leftBrookHalf[leftBrookHalf.length - 1];
         let rightBrookEndPoint = rightBrookHalf[0];
+        for (let x = leftBrookEndPoint.x + 1; x <= rightBrookEndPoint.x; x++) {
+            resultBrook.push({
+                "x": x,
+                "y": leftBrookEndPoint.y
+            });
+        }
 
-        // for (let x = leftBrookEndPoint.x + 1; x <= rightBrookEndPoint.x; x++) {
-        //     resultBrook.push({
-        //         "x": x,
-        //         "y": leftBrookEndPoint.y
-        //     });
-        // }
+        let resultBrookEndPoint = resultBrook[resultBrook.length - 1];
+        if (resultBrookEndPoint.y < rightBrookEndPoint.y) {
+            for (let y = resultBrookEndPoint.y + 1; y < rightBrookEndPoint.y; y++) {
+                resultBrook.push({
+                    "x": resultBrookEndPoint.x,
+                    "y": y
+                });
+            }
+        }
+        else if (resultBrookEndPoint.y > rightBrookEndPoint.y) {
+            for (let y = resultBrookEndPoint.y - 1; y > rightBrookEndPoint.y; y--) {
+                resultBrook.push({
+                    "x": resultBrookEndPoint.x,
+                    "y": y
+                });
+            }
+        }
 
-
-        // let resultBrookEndPoint = resultBrook[resultBrook.length - 1];
-        // if (resultBrookEndPoint.y < rightBrookEndPoint.y) {
-        //     for (let y = resultBrookEndPoint.y + 1; y < rightBrookEndPoint.y; y++) {
-        //         resultBrook.push({
-        //             "x": resultBrookEndPoint.x,
-        //             "y": y
-        //         });
-        //     }
-        // }
-        // else if (resultBrookEndPoint.y > rightBrookEndPoint.y) {
-        //     for (let y = resultBrookEndPoint.y - 1; y > rightBrookEndPoint.y; y--) {
-        //         resultBrook.push({
-        //             "x": resultBrookEndPoint.x,
-        //             "y": y
-        //         });
-        //     }
-        // }
-
+        resultBrookEndPoint = resultBrook[resultBrook.length - 1];
+        rightBrookEndPoint = rightBrookHalf[0];
+        if (resultBrookEndPoint.x === rightBrookEndPoint.x &&
+            resultBrookEndPoint.y === rightBrookEndPoint.y) {
+            rightBrookHalf = rightBrookHalf.slice(1);
+        }
         resultBrook = resultBrook.concat(rightBrookHalf);
         return resultBrook.map(waterTile => {
             return {
