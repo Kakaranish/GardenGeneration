@@ -22,9 +22,9 @@ class MapEvolutionist {
 
         let bestEntitiesCount = Math.ceil(generationSize / 2);
         let bestEntities = entitiesScores.sort((a, b) => {
-            return b.score - a.score ;
+            return b.score - a.score;
         }).slice(0, bestEntitiesCount);
-        
+
         console.log(bestEntities.map(entity => entity.score));
         let newGeneration = [];
         for (let i = 0; i < bestEntitiesCount; i++) {
@@ -34,7 +34,7 @@ class MapEvolutionist {
                 }
                 let entityFromNewGeneration = MapCrosser.crossMaps(
                     bestEntities[i].entity, bestEntities[j].entity);
-                
+
                 newGeneration.push(entityFromNewGeneration);
             }
         }

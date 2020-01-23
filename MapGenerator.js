@@ -138,8 +138,6 @@ class MapGenerator {
         return flora;
     }
 
-
-
     static randomHorizontalMovementsLenghts() {
         let breaksCount = randomInt(4, 7);
         let maxHorizontalMovementLength = Math.floor(MAP_WIDTH / breaksCount) + 2;
@@ -192,14 +190,14 @@ class MapGenerator {
     }
 
     static getTilesSurroundingBrook(map, filterAroundBridge = true) {
-        let waterTiles = map.waterTiles;
         let directions = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT];
         let surroundingTiles = [];
 
-        waterTiles.forEach(tile => {
+        map.waterTiles.forEach(tile => {
             directions.forEach(direction => {
+                console.log(tile);
                 if (tile.isInRelationWithOtherTile(direction, TileType.WATER) === false) {
-                    let surroundingTile = tile.getChildCoords(direction);
+                    let surroundingTile = tile.getNeighbourCoords(direction);
                     if (map.isPointLegal(surroundingTile)) {
                         surroundingTiles.push(surroundingTile);
                     }

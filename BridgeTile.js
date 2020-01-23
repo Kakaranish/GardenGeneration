@@ -1,13 +1,13 @@
 class BridgeTile extends Tile {
-    constructor(map, parent, x, y) {
-        super(map, parent, TileType.BRIDGE, x, y);
+    constructor(map, x, y) {
+        super(map, TileType.BRIDGE, x, y);
         this.map.bridge = this;
     }
 
     isHorizontal() {
         let tile_type_above = this.map.getTileType(this.x, this.y - 1);
         let tile_type_below = this.map.getTileType(this.x, this.y + 1);
-        if (tile_type_above === TileType.WATER 
+        if (tile_type_above === TileType.WATER
             && tile_type_below === TileType.WATER) {
             return false;
         }

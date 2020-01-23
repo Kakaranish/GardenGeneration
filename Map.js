@@ -7,7 +7,6 @@ class Map {
         this.initTiles();
 
         this.waterTiles = [];
-
         this.pathTiles = [];
         this.bridge = null;
     }

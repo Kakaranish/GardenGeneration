@@ -65,8 +65,7 @@ function randomFloraType(randomSet = undefined) {
     return randomSet[randomIndex];
 }
 
-function clearCanvasContainer()
-{
+function clearCanvasContainer() {
     document.getElementById("canvas_container").innerHTML = "";
 }
 

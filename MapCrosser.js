@@ -12,7 +12,7 @@ class MapCrosser {
 
         let brook = MapCrosser.crossBrooks(leftMap.waterTiles, rightMap.waterTiles, MAP_WIDTH);
         brook.forEach(waterTile => {
-            new WaterTile(crossResult, null, waterTile.x, waterTile.y);
+            new WaterTile(crossResult, waterTile.x, waterTile.y);
         });
 
         let bridge = MapGenerator.generateBridge(crossResult);  // Always at center of the map
