@@ -21,13 +21,12 @@ class Tile {
         }
     }
 
-    isInRelationWithOtherTile(direction, childTileType = undefined) {
+    isInRelationWithOtherTileInDirection(direction, childTileType = undefined) {
         let otherTileCoords = this.getNeighbourCoords(direction);
-        if(this.map.isPointLegal(otherTileCoords)){
+        if (this.map.isPointLegal(otherTileCoords) === false) {
             return false;
         }
         let otherTile = this.map.tiles[otherTileCoords.x - 1][otherTileCoords.y - 1];
-        console.log(otherTile);
 
         if (childTileType !== undefined) {
             return otherTile !== undefined && otherTile.tileType === childTileType;

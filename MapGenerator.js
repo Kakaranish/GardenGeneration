@@ -195,8 +195,7 @@ class MapGenerator {
 
         map.waterTiles.forEach(tile => {
             directions.forEach(direction => {
-                console.log(tile);
-                if (tile.isInRelationWithOtherTile(direction, TileType.WATER) === false) {
+                if (tile.isInRelationWithOtherTileInDirection(direction, TileType.WATER) === false) {
                     let surroundingTile = tile.getNeighbourCoords(direction);
                     if (map.isPointLegal(surroundingTile)) {
                         surroundingTiles.push(surroundingTile);

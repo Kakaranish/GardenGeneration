@@ -1,4 +1,13 @@
+const BrookDistancePriority = 3;
+const CoverageAlongBrookPriority = 6;
+const FloraSquaresPriority = 1.5;
+
 class MapEvaluator {
+    static showPriorities() {
+        console.log("Brook distance priority: " + BrookDistancePriority);
+        console.log("Coverage along brook priority: " + CoverageAlongBrookPriority);
+        console.log("Flora squares priority: " + FloraSquaresPriority);
+    }
 
     static evaluateMapScore(map) {
         // Priority:
@@ -7,25 +16,22 @@ class MapEvaluator {
         // 3. Coverage along brook
 
         // Smaller => better [80,200]
-        const brookDistancePriority = 3;
         const maxBrookDistanceFromCenter = 200;
         let totalDistanceFromHorizontalCenter
             = MapEvaluator.evaluateTotalBrookDistanceFromHorizontalCentralAxis(map);
-        let distanceFactor = brookDistancePriority *
+        let distanceFactor = BrookDistancePriority *
             (1 - (totalDistanceFromHorizontalCenter / maxBrookDistanceFromCenter));
 
         // Higher => better - [0,1]
-        const coverageAlongBrookPriority = 1;
         let coverageAlongBrook = MapEvaluator.evaluateCoverageAlongBrook(map);
-        let coverageAlongBrookFactor = coverageAlongBrookPriority * coverageAlongBrook;
-        
+        let coverageAlongBrookFactor = CoverageAlongBrookPriority * coverageAlongBrook;
+
         // Higher => better - [0,40]
-        const floraSquaresPriority = 2.5;
         const maxFloraSquaresValue = 40;
         let floraSquares = MapEvaluator.evaluateFloraSquares(map);
-        let floraFactor = floraSquaresPriority * (floraSquares / maxFloraSquaresValue);
+        let floraFactor = FloraSquaresPriority * (floraSquares / maxFloraSquaresValue);
 
-        let totalScore = distanceFactor + floraFactor +  coverageAlongBrookFactor;
+        let totalScore = distanceFactor + floraFactor + coverageAlongBrookFactor;
         return totalScore;
     }
 

@@ -30,7 +30,7 @@ class MapCrosser {
     static crossBrooks(leftBrook, rightBrook) {
         let randomFactor = randomInt(1, 10);
         let shouldOccurMutation = randomFactor === 5; // Any number
-        if (shouldOccurMutation) { 
+        if (shouldOccurMutation) {
             let leftIsChoosen = randomTrueOrFalse();
             if (leftIsChoosen) {
                 leftBrook = MapGenerator.generateBrook();
@@ -42,7 +42,7 @@ class MapCrosser {
 
         let trimmedLeftBrookHalf = MapCrosser.getTrimmedBrookFromLeftHalfOfMap(leftBrook);
         let trimmedRightBrookHalf = MapCrosser.getTrimmedBrookFromRightHalfOfMap(rightBrook);
- 
+
         let resultBrook = [].concat(trimmedLeftBrookHalf);
         let leftBrookEndPoint = trimmedLeftBrookHalf[trimmedLeftBrookHalf.length - 1];
         let rightBrookEndPoint = trimmedRightBrookHalf[0];
@@ -92,15 +92,14 @@ class MapCrosser {
         return leftFlora.concat(rightFlora);
     }
 
-    static getTrimmedBrookFromLeftHalfOfMap(brook)
-    {
+    static getTrimmedBrookFromLeftHalfOfMap(brook) {
         let mapCenter = {
             "x": Math.round(MAP_WIDTH / 2),
             "y": Math.round(MAP_HEIGHT / 2)
         };
         let leftBrookHalf = this.getBrookFromLeftHalfOfMap(brook);
         leftBrookHalf.reverse();
-        
+
         let tileIndex = 0;
         while (leftBrookHalf[tileIndex].x >= mapCenter.x - 3) {
             tileIndex++;
@@ -111,15 +110,14 @@ class MapCrosser {
         return leftBrookHalf;
     }
 
-    static getTrimmedBrookFromRightHalfOfMap(brook)
-    {
+    static getTrimmedBrookFromRightHalfOfMap(brook) {
         let mapCenter = {
             "x": Math.round(MAP_WIDTH / 2),
             "y": Math.round(MAP_HEIGHT / 2)
         };
         let rightBrookHalf = MapCrosser.getBrookFromRightHalfOfMap(brook);
         let tileIndex = 0;
-        
+
         while (rightBrookHalf[tileIndex].x <= mapCenter.x + 3) {
             tileIndex++;
         }
@@ -162,8 +160,8 @@ class MapCrosser {
             floraTiles.splice(indexToRemove, 1);
         }
 
-        let centerIndex = Math.ceil(MAP_WIDTH / 2.);
         let distortionOffset = randomTrueOrFalse() ? 2 : -2;
+        let centerIndex = Math.ceil(MAP_WIDTH / 2.);
         for (let i = 1; i <= toDistortCount + distortionOffset; i++) {
             let tile = null;
             let randomTileCoords = null;
@@ -200,8 +198,9 @@ class MapCrosser {
             floraTiles.splice(indexToRemove, 1);
         }
 
+        let distortionOffset = randomTrueOrFalse() ? 2 : -2;
         let centerIndex = Math.ceil(MAP_WIDTH / 2.);
-        for (let i = 1; i <= toDistortCount + 2; i++) {
+        for (let i = 1; i <= toDistortCount + distortionOffset; i++) {
             let tile = null;
             let randomTileCoords = null;
             while (tile !== undefined) {

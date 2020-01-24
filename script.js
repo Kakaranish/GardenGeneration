@@ -76,3 +76,4 @@ function generateButtonOnClick() {
 }
 document.getElementById("generate_button").onclick = generateButtonOnClick;
 
+MapEvaluator.showPriorities();
