@@ -111,7 +111,7 @@ class MapGenerator {
 
     static generateFlora(map) {
         let randomSet = [
-            TileType.ROCK,
+            TileType.ROCK, TileType.ROCK,
             TileType.TREE, TileType.TREE, TileType.TREE,
             TileType.FLOWER1, TileType.FLOWER1,
             TileType.FLOWER2, TileType.FLOWER2

@@ -1,5 +1,5 @@
 const BrookDistancePriority = 3;
-const CoverageAlongBrookPriority = 6;
+const CoverageAlongBrookPriority = 2;
 const FloraSquaresPriority = 1.5;
 
 class MapEvaluator {
